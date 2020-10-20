@@ -1,0 +1,91 @@
+{
+  "name": "babel-plugin-transform-mjs-imports",
+  "version": "1.0.0",
+  "description": "Perform various transforms on import declarations when emitting .mjs files including import source rewrites and transforming CJS named imports",
+  "keywords": [
+    "babel",
+    "webpack",
+    "cjs",
+    "cjs2",
+    "mjs",
+    "esm",
+    "es",
+    "modules",
+    "javascript",
+    "ecmascript",
+    "typescript",
+    "imports",
+    "node",
+    "library"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Xunnamius/babel-plugin-transform-mjs-imports"
+  },
+  "license": "Unlicense",
+  "author": "Xunnamius",
+  "sideEffects": false,
+  "type": "commonjs",
+  "exports": {
+    ".": "./dist/index.js",
+    "./package": "./package.json",
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "/dist",
+    "/LICENSE",
+    "/package.json",
+    "/README.md"
+  ],
+  "scripts": {
+    "build": "npm run clean && tsc --project tsconfig.types.json && NODE_ENV=production webpack --config-name main",
+    "build-stats": "NODE_ENV=production webpack --config-name main --json > bundle-stats.json",
+    "check-types": "rm -f npm.pipe; touch npm.pipe; command -v unbuffer >/dev/null; X=$?; [ $X -eq 0 ] && unbuffer tsc >> npm.pipe; Y=$?; [ $Y -eq 0 ] && echo >> npm.pipe; unbuffer eslint . >> npm.pipe; Z=$?; [ $X -ne 0 ] && tsc >> npm.pipe && eslint . >> npm.pipe; W=$?; cat npm.pipe | less -R -FX; rm npm.pipe; [ $W -eq 0 ] && [ $X -eq 1 ] || [ $X -eq 0 ] && [ $Y -eq 0 ] && [ $Z -eq 0 ]",
+    "clean": "rm -rf dist npm.pipe coverage external-scripts/bin",
+    "list-tasks": "npm run",
+    "prepublishOnly": "npm run build",
+    "postpublish": "npm run clean",
+    "publishGuard": "npm run check-types && npm run test && npx npm-force-resolutions && npx Xunnamius/sort-package-json && npm audit",
+    "repl": "command -v rlwrap >/dev/null && rlwrap npx -p @babel/core -p @babel/node babel-node",
+    "test": "BABEL_ENV=test jest --coverage"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.12.1",
+    "@babel/core": "^7.12.3",
+    "@babel/plugin-proposal-export-default-from": "^7.12.1",
+    "@babel/plugin-proposal-function-bind": "^7.12.1",
+    "@babel/preset-env": "^7.12.1",
+    "@babel/preset-typescript": "^7.12.1",
+    "@types/babel-types": "^7.0.9",
+    "@types/babel__core": "^7.1.10",
+    "@types/jest": "^26.0.15",
+    "@types/node": "^14.14.0",
+    "@typescript-eslint/eslint-plugin": "^4.5.0",
+    "@typescript-eslint/parser": "^4.5.0",
+    "babel-eslint": "^10.1.0",
+    "babel-jest": "^26.6.0",
+    "babel-loader": "^8.1.0",
+    "babel-plugin-source-map-support": "^2.1.3",
+    "babel-plugin-tester": "^10.0.0",
+    "eslint": "^7.11.0",
+    "eslint-import-resolver-alias": "^1.1.2",
+    "eslint-import-resolver-typescript": "^2.3.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jest": "^24.1.0",
+    "eslint-plugin-react": "^7.21.5",
+    "jest": "^26.6.0",
+    "jest-circus": "^26.6.0",
+    "jest-extended": "^0.11.5",
+    "npm-force-resolutions": "0.0.3",
+    "source-map-support": "^0.5.19",
+    "typescript": "^4.0.3",
+    "webpack": "^5.1.3",
+    "webpack-cli": "^4.1.0",
+    "webpack-node-externals": "^2.5.2"
+  },
+  "engines": {
+    "node": ">= 10.x"
+  }
+}
