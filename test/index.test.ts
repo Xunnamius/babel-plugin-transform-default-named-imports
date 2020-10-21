@@ -5,6 +5,7 @@ describe('babel-plugin-transform-mjs-imports', () => {
     it('(todo)', async () => {
         expect.hasAssertions();
 
+        void pluginTester;
         void plugin;
     });
 });

@@ -54,9 +54,9 @@ module.exports = {
     plugins: [
         ['babel-plugin-transform-mjs-imports', {
             test: [ ...getModuleTypes().cjs ], // ◄ match all CJS modules
-            exclude: /(?!)/, // ◄ never matches any modules
+            exclude: /(?!)/, // ◄ never match any modules
             transformBuiltins: true, // ◄ match all built-in modules
-            silent: false, // ◄ output some analysis to stdout
+            silent: false, // ◄ output results to stdout if silent == false
         }],
     ],
 };
