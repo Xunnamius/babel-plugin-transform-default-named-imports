@@ -1,5 +1,6 @@
 import { PluginObj, PluginPass } from '@babel/core'
 import { builtinModules } from 'module'
+import { determineModuleTypes } from 'webpack-node-modules-types'
 
 import * as util from '@babel/types'
 
@@ -38,8 +39,9 @@ const stringsToRegexes = (str: string | RegExp) => {
 };
 
 const getDefaultInclusionTests = () => {
-    // TODO: webpack-node-module-types
-    return cache.cjsNodeModules.length ? cache.cjsNodeModules : ({ cjs: [] as string[] }).cjs.map(stringsToRegexes);
+    return cache.cjsNodeModules.length
+        ? cache.cjsNodeModules
+        : determineModuleTypes().cjs.map(stringsToRegexes);
 };
 
 const getBuiltinInclusionTests = () => {

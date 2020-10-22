@@ -86,8 +86,14 @@ module.exports = {
 };
 ```
 
+> Replacing the `test` array like this also replaces the default list of CJS
+> modules from `node_modules`. To append rather than replace, try something like
+> `test: [ ...getModuleTypes().cjs, 'another/source/path.js',
+> 'something-special' ]`.
+
 Note that we don't have to match for `url` because it's a built-in and
 `transformBuiltins` is `true` by default.
+
 
 ## Motivation
 
