@@ -64,11 +64,11 @@ module.exports = {
 ```
 
 You can manually specify which import sources are CJS using the `test` and
-`exclude` configuration options, which accept an array of strings to match
-sources against. If a string begins and ends with a `/` (e.g. `/^apollo/`), it
-will be evaluated as a case-insensitive regular expression. Named imports with
-sources that match any string in `test` *and fail to match all strings in
-`exclude`* will be transformed. You can also skip transforming built-ins by
+`exclude` configuration options, which accept an array of strings/RegExp items
+to match sources against. If a string begins and ends with a `/` (e.g.
+`/^apollo/`), it will be evaluated as a case-insensitive RegExp item. Named
+imports with sources that match any item in `test` *and fail to match all items
+in `exclude`* will be transformed. You can also skip transforming built-ins by
 default (unless they match in `test`) using `transformBuiltins: false`.
 
 For instance, if we want only to transform any imports (bare or deep) of
@@ -80,7 +80,7 @@ module.exports = {
     plugins: [
         ['babel-plugin-transform-mjs-imports', {
             // ▼ regex matches any import that starts with 'apollo-server'
-            test: [ '/^apollo-server/' ],
+            test: [ /^apollo-server/ ],
         }],
     ],
 };

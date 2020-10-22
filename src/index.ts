@@ -30,8 +30,8 @@ const _metadata: { [path: string]: {
     eTests: RegExp[],
 }} = {};
 
-const stringsToRegexes = (str: string) => {
-    return new RegExp(str.startsWith('/') && str.endsWith('/')
+const stringsToRegexes = (str: string | RegExp) => {
+    return str instanceof RegExp ? str : new RegExp(str.startsWith('/') && str.endsWith('/')
         ? str.slice(1, -1)
         // ? https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions#Escaping
         : `^${str.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&')}$`, 'i');
@@ -84,12 +84,14 @@ export default function(): PluginObj<State> {
                 },
                 exit(_, state) {
                     if(state.opts.silent === false) {
-                        // eslint-disable-next-line no-console
                         const { total, transformed } = getMetadata(state);
-                        const details = state.opts.verbose ? ` [${transformed.join(', ')}]` : '';
+
+                        const details = `${transformed.length}/${total}`
+                            + (state.opts.verbose && transformed.length ? ` [${transformed.join(', ')}]` : '');
 
                         if(state.opts.verbose || transformed.length)
-                            console.log(`target: ${state.filename}\nimports transformed: /${total}${details}\n---`);
+                            // eslint-disable-next-line no-console
+                            console.log(`target: ${state.filename}\nimports transformed: ${details}\n---`);
                     }
                 }
             },
