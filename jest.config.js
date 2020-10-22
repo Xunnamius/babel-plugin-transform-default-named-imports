@@ -8,5 +8,4 @@ module.exports = {
     verbose: false,
     testPathIgnorePatterns: [ '/node_modules/' ],
     setupFilesAfterEnv: [ './test/setup.ts' ],
-    //snapshotResolver: './test/resolver.js',
 };

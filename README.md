@@ -54,20 +54,22 @@ module.exports = {
     plugins: [
         ['babel-plugin-transform-mjs-imports', {
             test: [ ...getModuleTypes().cjs ], // ◄ match all CJS modules
-            exclude: /(?!)/, // ◄ never match any modules
+            exclude: [], // ◄ never excludes modules by default
             transformBuiltins: true, // ◄ match all built-in modules
-            silent: false, // ◄ output results to stdout if silent == false
+            silent: true, // ◄ output results to stdout if silent == false
+            verbose: false, // ◄ output more detailed results if silent == false
         }],
     ],
 };
 ```
 
 You can manually specify which import sources are CJS using the `test` and
-`exclude` configuration options, which accept an array of strings and regular
-expressions to match sources against. Named imports with sources that match any
-string/regex in `test` *and fail to match all strings/regexes in `exclude`* will
-be transformed. You can also skip transforming built-ins by default (unless they
-match in `test`) using `transformBuiltins: false`.
+`exclude` configuration options, which accept an array of strings to match
+sources against. If a string begins and ends with a `/` (e.g. `/^apollo/`), it
+will be evaluated as a case-insensitive regular expression. Named imports with
+sources that match any string in `test` *and fail to match all strings in
+`exclude`* will be transformed. You can also skip transforming built-ins by
+default (unless they match in `test`) using `transformBuiltins: false`.
 
 For instance, if we want only to transform any imports (bare or deep) of
 `apollo-server` and any built-ins like `url` from the above example, my
@@ -78,7 +80,7 @@ module.exports = {
     plugins: [
         ['babel-plugin-transform-mjs-imports', {
             // ▼ regex matches any import that starts with 'apollo-server'
-            test: [ /^apollo-server/ ],
+            test: [ '/^apollo-server/' ],
         }],
     ],
 };
@@ -164,26 +166,26 @@ assignment of the named imports:
 /* my-package.mjs (using babel-plugin-transform-mjs-imports) */
 
 // ▼ #1: named CJS import (transformed)
-import _$apollo_server from 'apollo-server' // ◄ default import
+import _$apollo_server from "apollo-server"; // ◄ default import
 const { ApolloServer, gql } = _$apollo_server; // ◄ destructuring assignment
 // ▼ #2: named ESM import (preserved)
-import { Button } from 'ui-library/es'
+import { Button } from "ui-library/es";
 // ▼ #3: named built-in import (transformed)
-import _$url from 'url' // ◄ default import
+import _$url from "url"; // ◄ default import
 const { parse: parseUrl } = _$url; // ◄ destructuring assignment
 // ▼ #4: default and namespace CJS import (preserved)
-import lib, * as libNamespace from 'cjs-component-library'
+import lib, * as libNamespace from "cjs-component-library";
 // ▼ #5: default CJS import (preserved); named CJS import (transformed)
-import lib2 from 'cjs2-component2-library2' // ◄ default import (preserved)
+import lib2 from "cjs2-component2-library2"; // ◄ default import (preserved)
 const { item1, item2 } = lib2; // ◄ destructuring assignment
 // ▼ #6: default CJS import (preserved)
-import lib3 from 'cjs3-component3-library3'
+import lib3 from "cjs3-component3-library3";
 // ▼ #7: namespace CJS import (preserved)
-import * as lib4 from 'cjs4-component4-library4'
+import * as lib4 from "cjs4-component4-library4";
 // ▼ #8: named ESM import (preserved) (eliminated by Webpack through bundling)
-import { util } from '../lib/module-utils.mjs'
+import { util } from "../lib/module-utils.mjs";
 // ▼ #9: named CJS import (default alias is preserved, rest is transformed)
-import util2 from 'some-package/dist/utils.js'// ◄ default import (preserved)
+import util2 from "some-package/dist/utils.js";// ◄ default import (preserved)
 const { util: smUtil, cliUtil } = util2; // ◄ destructuring assignment
 ```
 

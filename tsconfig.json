@@ -33,6 +33,7 @@
     "src/**/*.ts*",
     "external-scripts/**/*.ts*",
     "test/**/*.ts*",
+    "test/__fixtures__/**/*.mjs",
   ],
   "exclude": [
     "node_modules"
