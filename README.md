@@ -217,9 +217,52 @@ you submit a pull request, take care to maintain the existing coding style and
 add unit tests for any new or changed functionality. Please lint and test your
 code, of course!
 
-This package is published using
-[publish-please](https://www.npmjs.com/package/publish-please) via `npx
-publish-please`.
+### NPM Scripts
+
+Run `npm run list-tasks` to see which of the following scripts are available for
+this project.
+
+> Using these scripts requires a linux-like development environment. None of the
+> scripts are likely to work on non-POSIX environments. If you're on Windows,
+> use [WSL](https://docs.microsoft.com/en-us/windows/wsl/install-win10).
+
+#### Development
+
+- `npm run repl` to run a buffered TypeScript-Babel REPL
+- `npm test` to run the unit tests and gather test coverage data
+  - Look for HTML files under `coverage/`
+- `npm run check-build` to run the integration tests
+- `npm run check-types` to run a project-wide type check
+- `npm run test-repeat` to run the entire test suite 100 times
+  - Good for spotting bad async code and heisenbugs
+  - Uses `__test-repeat` NPM script under the hood
+- `npm run dev` to start a development server or instance
+- `npm run generate` to transpile config files (under `config/`) from scratch
+- `npm run regenerate` to quickly re-transpile config files (under `config/`)
+
+#### Building
+
+- `npm run clean` to delete all build process artifacts
+- `npm run build` to compile `src/` into `dist/`, which is what makes it into
+the published package
+- `npm run build-docs` to re-build the documentation
+- `npm run build-externals` to compile `external-scripts/` into
+  `external-scripts/bin/`
+- `npm run build-stats` to gather statistics about Webpack (look for
+  `bundle-stats.json`)
+
+#### Publishing
+
+- `npm run start` to start a production instance
+- `npm run publishGuard` to run pre-publication tests and validations (triggered
+  automatically when invoking
+  [publish-please](https://www.npmjs.com/package/publish-please))
+
+#### NPX
+
+- `npx publish-please` to publish the package
+- `npx sort-package-json` to consistently sort `package.json`
+- `npx npm-force-resolutions` to forcefully patch security audit problems
 
 ## Package Details
 
