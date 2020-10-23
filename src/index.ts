@@ -1,6 +1,6 @@
 import { PluginObj, PluginPass } from '@babel/core'
 import { builtinModules } from 'module'
-import { determineModuleTypes } from 'webpack-node-modules-types'
+import { determineModuleTypes } from 'webpack-node-module-types/sync'
 
 import * as util from '@babel/types'
 
@@ -31,30 +31,33 @@ const _metadata: { [path: string]: {
     eTests: RegExp[],
 }} = {};
 
-const stringsToRegexes = (str: string | RegExp) => {
+const stringToRegex = (str: string | RegExp, openEnded: boolean) => {
     return str instanceof RegExp ? str : new RegExp(str.startsWith('/') && str.endsWith('/')
         ? str.slice(1, -1)
         // ? https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions#Escaping
-        : `^${str.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&')}$`, 'i');
+        : `^${str.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&')}${openEnded ? '([/?#].+)?' : ''}$`, 'i');
 };
 
+const strToRegex = (str: string | RegExp) => stringToRegex(str, false);
+const strToOpenEndedRegex = (str: string | RegExp) => stringToRegex(str, true);
+
 const getDefaultInclusionTests = () => {
-    return cache.cjsNodeModules.length
+    return cache.cjsNodeModules = cache.cjsNodeModules.length
         ? cache.cjsNodeModules
-        : determineModuleTypes().cjs.map(stringsToRegexes);
+        : determineModuleTypes().cjs.map(strToOpenEndedRegex);
 };
 
 const getBuiltinInclusionTests = () => {
-    return cache.builtins.length ? cache.builtins : builtinModules.map(stringsToRegexes);
+    return cache.builtins = cache.builtins.length
+        ? cache.builtins
+        : builtinModules.map(strToOpenEndedRegex);
 };
 
 /**
  * Return `source` as an alphanumeric string with underscores replacing
  * non-alphanumeric characters
  */
-const makeSpecifierFrom = (source: string) => {
-    return '_$' + source.split('/').slice(-1)[0].replace(/(\?|#).*$/, '').replace(/[^a-z0-9]/ig, '_');
-};
+const makeSpecifierFrom = (source: string) => '_$' + source.replace(/[^a-z0-9]/ig, '_');
 
 const isCjs = (src: string, state: State) => {
     const { iTests, eTests } = getMetadata(state);
@@ -69,9 +72,9 @@ const getMetadata = (state: State) => {
         transformed: [],
         iTests: [
             ...(state.opts.transformBuiltins !== false ? getBuiltinInclusionTests() : []),
-            ...(state.opts.test?.map(stringsToRegexes) || getDefaultInclusionTests())
+            ...(state.opts.test?.map(strToRegex) || getDefaultInclusionTests())
         ],
-        eTests: state.opts.exclude?.map(stringsToRegexes) || []
+        eTests: state.opts.exclude?.map(strToRegex) || []
     };
 };
 
