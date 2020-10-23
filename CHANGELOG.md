@@ -1,4 +1,4 @@
-[1.0.0]: https://github.com/Xunnamius/babel-plugin-transform-mjs-imports/releases/tag/1.0.0
+[v1.0.0]: https://github.com/Xunnamius/babel-plugin-transform-mjs-imports/releases/tag/v1.0.0
 
 [https://keepachangelog.com/en/1.0.0/]::
 
@@ -22,7 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Released
 
-### [![1.0.0](https://api.ergodark.com/badges/github-tag-date/xunnamius/babel-plugin-transform-mjs-imports/1.0.0)][1.0.0]
+### [![v1.0.0](https://api.ergodark.com/badges/github-tag-date/xunnamius/babel-plugin-transform-mjs-imports/v1.0.0)][v1.0.0]
 #### Added
 - Initial release
 

@@ -91,6 +91,10 @@ module.exports = {
 > `test: [ ...getModuleTypes().cjs, 'another/source/path.js',
 > 'something-special' ]`.
 
+This is also useful when
+[`webpack-node-module-types`](https://www.npmjs.com/package/webpack-node-module-types)
+misclassifies a package or you want to override the defaults.
+
 Note that we don't have to match for `url` because it's a built-in and
 `transformBuiltins` is `true` by default.
 
