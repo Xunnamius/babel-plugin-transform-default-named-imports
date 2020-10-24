@@ -1,6 +1,6 @@
 {
   "name": "babel-plugin-transform-mjs-imports",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Perform various transforms on import declarations when emitting .mjs files including import source rewrites and transforming CJS named imports",
   "keywords": [
     "babel",

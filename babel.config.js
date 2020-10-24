@@ -28,7 +28,7 @@ module.exports = {
                     // ? https://github.com/babel/babel-loader/issues/521#issuecomment-441466991
                     //modules: false,
                     // ? https://nodejs.org/en/about/releases
-                    targets: { NODE_OLDEST_LTS }
+                    targets: { node: NODE_OLDEST_LTS }
                 }],
                 ['@babel/preset-typescript', { allowDeclareFields: true }],
                 // ? Webpack will handle minification

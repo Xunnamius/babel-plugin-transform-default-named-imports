@@ -22,6 +22,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Released
 
+### [![v1.0.1](https://api.ergodark.com/badges/github-tag-date/xunnamius/babel-plugin-transform-mjs-imports/v1.0.1)][v1.0.1]
+#### Changed
+- Updated README
+- Various small quality updates
+
+---
+
 ### [![v1.0.0](https://api.ergodark.com/badges/github-tag-date/xunnamius/babel-plugin-transform-mjs-imports/v1.0.0)][v1.0.0]
 #### Added
 - Initial release
