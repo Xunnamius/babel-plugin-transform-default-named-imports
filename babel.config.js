@@ -1,6 +1,9 @@
 // * Every now and then, we adopt best practices from CRA
 // * https://tinyurl.com/yakv4ggx
 
+// ? https://nodejs.org/en/about/releases
+const NODE_OLDEST_LTS = '10.13.0';
+
 module.exports = {
     parserOpts: { strictMode: true },
     plugins: [
@@ -25,7 +28,7 @@ module.exports = {
                     // ? https://github.com/babel/babel-loader/issues/521#issuecomment-441466991
                     //modules: false,
                     // ? https://nodejs.org/en/about/releases
-                    targets: { node: '10.13.0' }
+                    targets: { NODE_OLDEST_LTS }
                 }],
                 ['@babel/preset-typescript', { allowDeclareFields: true }],
                 // ? Webpack will handle minification
