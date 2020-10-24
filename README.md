@@ -254,9 +254,10 @@ the published package
 #### Publishing
 
 - `npm run start` to start a production instance
-- `npm run publishGuard` to run pre-publication tests and validations (triggered
-  automatically when invoking
-  [publish-please](https://www.npmjs.com/package/publish-please))
+- `npm run fixup` to run pre-publication tests, rebuilds (like documentation),
+  and validations
+  - Triggered automatically by
+    [publish-please](https://www.npmjs.com/package/publish-please)
 
 #### NPX
 

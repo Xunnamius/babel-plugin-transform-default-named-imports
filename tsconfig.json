@@ -19,13 +19,13 @@
     "lib": [
       "dom",
       "dom.iterable",
-      "esnext",
+      "esnext"
     ],
     "skipLibCheck": true,
     "noEmit": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "inlineSourceMap": true,
+    "inlineSourceMap": true
   },
   "include": [
     "types/**/*.ts*",
@@ -33,9 +33,9 @@
     "src/**/*.ts*",
     "external-scripts/**/*.ts*",
     "test/**/*.ts*",
-    "test/__fixtures__/**/*.mjs",
+    "test/__fixtures__/**/*.mjs"
   ],
   "exclude": [
     "node_modules"
-  ],
+  ]
 }
