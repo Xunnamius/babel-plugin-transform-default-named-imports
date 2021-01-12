@@ -1,6 +1,6 @@
 [![Black Lives Matter!](https://api.ergodark.com/badges/blm "Join the movement!")](https://secure.actblue.com/donate/ms_blm_homepage_2019)
 [![Maintenance status](https://img.shields.io/maintenance/active/2021 "Is this package maintained?")](https://www.npmjs.com/package/babel-plugin-transform-mjs-imports)
-[![Last commit timestamp](https://img.shields.io/github/last-commit/xunnamius/babel-plugin-transform-mjs-imports/develop "When was the last commit to the official repo?")](https://www.npmjs.com/package/babel-plugin-transform-mjs-imports)
+[![Last commit timestamp](https://img.shields.io/github/last-commit/xunnamius/babel-plugin-transform-mjs-imports "When was the last commit to the official repo?")](https://www.npmjs.com/package/babel-plugin-transform-mjs-imports)
 [![Open issues](https://img.shields.io/github/issues/xunnamius/babel-plugin-transform-mjs-imports "Number of known issues with this package")](https://www.npmjs.com/package/babel-plugin-transform-mjs-imports)
 [![Pull requests](https://img.shields.io/github/issues-pr/xunnamius/babel-plugin-transform-mjs-imports "Number of open pull requests")](https://www.npmjs.com/package/babel-plugin-transform-mjs-imports)
 [![DavidDM dependencies](https://img.shields.io/david/xunnamius/babel-plugin-transform-mjs-imports "Status of this package's dependencies")](https://david-dm.org/xunnamius/babel-plugin-transform-mjs-imports)
@@ -23,7 +23,7 @@ technically-invalid CJS named import syntax.
 ## Installation and Usage
 
 ```Bash
-npm install --save-dev babel-plugin-transform-mjs-imports webpack-node-module-types
+npm install --save-dev babel-plugin-transform-mjs-imports
 ```
 
 And in your `babel.config.js`:
@@ -45,7 +45,10 @@ packages (e.g. `http`, `url`, `path`) and any CJS package under `node_modules`
 (reported by
 [`webpack-node-module-types`](https://www.npmjs.com/package/webpack-node-module-types)).
 
-Hence, the default configuration looks like this:
+### Custom Configuration
+
+Out of the box with zero configuration, the default settings look something like
+this:
 
 ```JavaScript
 const { getModuleTypes } = require('webpack-node-module-types');
@@ -67,8 +70,8 @@ You can manually specify which import sources are CJS using the `test` and
 `exclude` configuration options, which accept an array of strings/RegExp items
 to match sources against. If a string begins and ends with a `/` (e.g.
 `/^apollo/`), it will be evaluated as a case-insensitive RegExp item. Named
-imports with sources that match any item in `test` *and fail to match all items
-in `exclude`* will be transformed. You can also skip transforming built-ins by
+imports with sources that match any item in `test` _and fail to match all items
+in `exclude`_ will be transformed. You can also skip transforming built-ins by
 default (unless they match in `test`) using `transformBuiltins: false`.
 
 For instance, if we want only to transform any imports (bare or deep) of
@@ -86,18 +89,33 @@ module.exports = {
 };
 ```
 
-> Replacing the `test` array like this also replaces the default list of CJS
-> modules from `node_modules`. To append rather than replace, try something like
-> `test: [ ...getModuleTypes().cjs, 'another/source/path.js',
-> 'something-special' ]`.
+Replacing the `test` array like this also replaces the default list of CJS
+modules from `node_modules`. To append rather than replace, try something like:
+
+```Bash
+npm install --save-dev webpack-node-module-types
+```
+
+```JavaScript
+const { getModuleTypes } = require('webpack-node-module-types');
+
+module.exports = {
+    plugins: [
+        ['babel-plugin-transform-mjs-imports', {
+            // ▼ extend, rather than override, the default settings
+            test: test: [
+              ...getModuleTypes().cjs,
+              'another/source/path.js',
+              'something-special'
+            ],
+        }],
+    ],
+};
+```
 
 This is also useful when
 [`webpack-node-module-types`](https://www.npmjs.com/package/webpack-node-module-types)
 misclassifies a package or you want to override the defaults.
-
-Note that we don't have to match for `url` because it's a built-in and
-`transformBuiltins` is `true` by default.
-
 
 ## Motivation
 
@@ -107,9 +125,7 @@ using `.mjs` files destined to be published in an NPM package:
 1. All import sources that are [not
    bare](https://nodejs.org/api/esm.html#esm_import_specifiers) and not found in
    [the package's `imports`/`exports` key][exports-main-key] **must include a
-   file extension**. This includes imports on directories e.g. `import { Button}
-   from './component/button'`, which should appear in an `.mjs` file as `import
-   { Button } from './component/button/index.mjs'`.
+   file extension**. This includes imports on directories e.g. `import { Button} from './component/button'`, which should appear in an `.mjs` file as `import { Button } from './component/button/index.mjs'`.
 
 2. CJS modules can only be imported using **default import syntax**. As far as
    Webpack 4 and (so far) Webpack 5 is concerned, this includes built-ins too.
@@ -153,8 +169,7 @@ import { default as util2, util as smUtil, cliUtil } from 'some-package/dist/uti
 ```
 
 The above syntax, which is all legal in Node 14 and TypeScript, will survive
-transpilation when emitting `my-package.mjs`. Running this with `node
-my-package.mjs` works. Further, if we run this file as an entry point through
+transpilation when emitting `my-package.mjs`. Running this with `node my-package.mjs` works. Further, if we run this file as an entry point through
 Webpack (with babel-loader) and emit CJS bundle file **`my-package.js`**,
 running `node my-package.js` also works. Everything works, and `my-package.mjs`
 \+ `my-package.js` can be distributed as a dual CJS2/ESM package!
@@ -163,10 +178,7 @@ Just one problem: when Webpack and other bundlers attempt to process this as a
 tree-shakable ESM package (using our `.mjs` entry point), they'll [choke and
 die](https://github.com/formatjs/formatjs/issues/1395) when they encounter the
 "illegal" CJS named imports. This usually manifests as strange errors like
-`ERROR in ./my-package.mjs Can't import the named export 'ApolloServer' from non
-EcmaScript module (only default export is available)` or `ERROR in
-./node_modules/my-package/dist/my-package.mjs Can't import the named export
-'parse' from non EcmaScript module (only default export is available)`.
+`ERROR in ./my-package.mjs Can't import the named export 'ApolloServer' from non EcmaScript module (only default export is available)` or `ERROR in ./node_modules/my-package/dist/my-package.mjs Can't import the named export 'parse' from non EcmaScript module (only default export is available)`.
 
 `babel-plugin-transform-mjs-imports` remedies this by transforming each named
 import of a CJS module into a default CJS import with a constant destructuring
@@ -244,7 +256,7 @@ this project.
 
 - `npm run clean` to delete all build process artifacts
 - `npm run build` to compile `src/` into `dist/`, which is what makes it into
-the published package
+  the published package
 - `npm run build-docs` to re-build the documentation
 - `npm run build-externals` to compile `external-scripts/` into
   `external-scripts/bin/`
@@ -268,7 +280,7 @@ the published package
 ## Package Details
 
 > You don't need to read this section to use this package, everything should
-"just work"!
+> "just work"!
 
 This is a simple [CJS2](https://github.com/webpack/webpack/issues/1114) package
 with a default export.
