@@ -18,7 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Upcoming]
 
-(no notes yet)
+Switching to semantic-release based workflow very soon. These notes are
+outdated.
 
 ## Released
 
