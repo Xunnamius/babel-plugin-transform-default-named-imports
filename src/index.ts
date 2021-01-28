@@ -1,8 +1,8 @@
-import { PluginObj, PluginPass } from "@babel/core";
-import { builtinModules } from "module";
-import { determineModuleTypes } from "webpack-node-module-types/sync";
+import { PluginObj, PluginPass } from '@babel/core';
+import { builtinModules } from 'module';
+import { determineModuleTypes } from 'webpack-node-module-types/sync';
 
-import * as util from "@babel/types";
+import * as util from '@babel/types';
 
 export type Options = {
   opts: {
@@ -21,7 +21,7 @@ const cache: {
   cjsNodeModules: RegExp[];
 } = {
   builtins: [],
-  cjsNodeModules: [],
+  cjsNodeModules: []
 };
 
 const _metadata: {
@@ -37,13 +37,13 @@ const stringToRegex = (str: string | RegExp, openEnded: boolean) => {
   return str instanceof RegExp
     ? str
     : new RegExp(
-        str.startsWith("/") && str.endsWith("/")
+        str.startsWith('/') && str.endsWith('/')
           ? str.slice(1, -1)
           : // ? https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions#Escaping
-            `^${str.replace(/[.*+\-?^${}()|[\]\\]/g, "\\$&")}${
-              openEnded ? "([/?#].+)?" : ""
+            `^${str.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&')}${
+              openEnded ? '([/?#].+)?' : ''
             }$`,
-        "i"
+        'i'
       );
 };
 
@@ -53,7 +53,10 @@ const strToOpenEndedRegex = (str: string | RegExp) => stringToRegex(str, true);
 const getDefaultInclusionTests = () => {
   return (cache.cjsNodeModules = cache.cjsNodeModules.length
     ? cache.cjsNodeModules
-    : determineModuleTypes().cjs.map(strToOpenEndedRegex));
+    : [
+        ...determineModuleTypes().cjs.map(strToOpenEndedRegex),
+        /^(\.(\.)?\/)+(.+)\.json$/
+      ]);
 };
 
 const getBuiltinInclusionTests = () => {
@@ -67,7 +70,7 @@ const getBuiltinInclusionTests = () => {
  * non-alphanumeric characters
  */
 const makeSpecifierFrom = (source: string) =>
-  "_$" + source.replace(/[^a-z0-9]/gi, "_");
+  '_$' + source.replace(/[^a-z0-9]/gi, '_');
 
 const isCjs = (src: string, state: State) => {
   const { iTests, eTests } = getMetadata(state);
@@ -75,7 +78,7 @@ const isCjs = (src: string, state: State) => {
 };
 
 const getMetadata = (state: State) => {
-  const key = state.filename || "<no path>";
+  const key = state.filename || '<no path>';
 
   return (_metadata[key] = _metadata[key] || {
     total: 0,
@@ -84,15 +87,15 @@ const getMetadata = (state: State) => {
       ...(state.opts.transformBuiltins !== false
         ? getBuiltinInclusionTests()
         : []),
-      ...(state.opts.test?.map(strToRegex) || getDefaultInclusionTests()),
+      ...(state.opts.test?.map(strToRegex) || getDefaultInclusionTests())
     ],
-    eTests: state.opts.exclude?.map(strToRegex) || [],
+    eTests: state.opts.exclude?.map(strToRegex) || []
   });
 };
 
 export default function (): PluginObj<State> {
   return {
-    name: "babel-plugin-transform-mjs-imports",
+    name: 'babel-plugin-transform-mjs-imports',
     visitor: {
       Program: {
         enter(_, state) {
@@ -106,8 +109,8 @@ export default function (): PluginObj<State> {
             const details =
               `${transformed.length}/${total}` +
               (state.opts.verbose && transformed.length
-                ? ` [${transformed.join(", ")}]`
-                : "");
+                ? ` [${transformed.join(', ')}]`
+                : '');
 
             if (state.opts.verbose || transformed.length)
               // eslint-disable-next-line no-console
@@ -115,7 +118,7 @@ export default function (): PluginObj<State> {
                 `target: ${state.filename}\nimports transformed: ${details}\n---`
               );
           }
-        },
+        }
       },
       ImportDeclaration(path, state) {
         const source = path.node.source.value;
@@ -125,10 +128,10 @@ export default function (): PluginObj<State> {
         if (!isCjs(source, state)) return;
 
         const specifiers = {
-          explicitDefault: "",
-          implicitDefault: "",
-          namespace: "",
-          named: [] as { actual: string; alias: string | null }[],
+          explicitDefault: '',
+          implicitDefault: '',
+          namespace: '',
+          named: [] as { actual: string; alias: string | null }[]
         };
 
         path.node.specifiers.forEach((node) => {
@@ -137,12 +140,12 @@ export default function (): PluginObj<State> {
               ? node.imported.value
               : node.imported.name;
 
-            if (name == "default") specifiers.implicitDefault = node.local.name;
+            if (name == 'default') specifiers.implicitDefault = node.local.name;
 
-            if (name != "default" || specifiers.explicitDefault) {
+            if (name != 'default' || specifiers.explicitDefault) {
               specifiers.named.push({
                 actual: name,
-                alias: name != node.local.name ? node.local.name : null,
+                alias: name != node.local.name ? node.local.name : null
               });
             }
           } else if (util.isImportDefaultSpecifier(node))
@@ -161,12 +164,12 @@ export default function (): PluginObj<State> {
 
         // ? Transform the import into a default CJS import
         path.node.specifiers = [
-          util.importDefaultSpecifier(newDefaultSpecifier),
+          util.importDefaultSpecifier(newDefaultSpecifier)
         ];
 
         // ? Insert a constant destructing assignment after
 
-        const declaration = util.variableDeclaration("const", [
+        const declaration = util.variableDeclaration('const', [
           util.variableDeclarator(
             util.objectPattern(
               specifiers.named.map((s) =>
@@ -179,13 +182,13 @@ export default function (): PluginObj<State> {
               )
             ),
             newDefaultSpecifier
-          ),
+          )
         ]);
 
         path.insertAfter(declaration);
 
         getMetadata(state).transformed.push(source);
-      },
-    },
+      }
+    }
   };
 }
