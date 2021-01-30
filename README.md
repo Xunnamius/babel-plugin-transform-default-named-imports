@@ -59,9 +59,9 @@ npx babel src --out-dir dist
 ```
 
 By default, this plugin will transform named imports for Node's built-in
-packages (e.g. `http`, `url`, `path`), JSON files, and any CJS package under
-`node_modules` classified as a CJS module by
-[`webpack-node-module-types`](https://www.npmjs.com/package/webpack-node-module-types).
+packages (e.g. `http`, `url`, `path`), for sources that end in `.json`, and for
+any CJS package under `node_modules` (determined by
+[`webpack-node-module-types`](https://www.npmjs.com/package/webpack-node-module-types)).
 **All other imports, including local imports, are left untouched.**
 
 ### Custom Configuration
@@ -126,16 +126,19 @@ npm install --save-dev webpack-node-module-types
 const { getModuleTypes } = require('webpack-node-module-types');
 
 module.exports = {
-    plugins: [
-        ['transform-default-named-imports', {
-            // ▼ extend, rather than override, the default settings
-            test: [
-              ...getModuleTypes().cjs,
-              'another/source/path.js',
-              'something-special'
-            ],
-        }],
-    ],
+  plugins: [
+    [
+      'transform-default-named-imports',
+      {
+        // ▼ extend, rather than override, the default settings
+        test: [
+          ...getModuleTypes().cjs,
+          'another/source/path.js',
+          'something-special'
+        ]
+      }
+    ]
+  ]
 };
 ```
 
