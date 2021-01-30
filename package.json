@@ -1,12 +1,11 @@
 {
   "name": "babel-plugin-transform-default-named-imports",
   "version": "1.0.5",
-  "description": "Allow esm-style importing of named exports from default-exporting (CJS/JSON) modules for free",
+  "description": "Allow importing of named exports from default-exporting (CJS/JSON) modules",
   "keywords": [
     "babel",
     "webpack",
     "cjs",
-    "cjs2",
     "mjs",
     "esm",
     "es",
