@@ -1,68 +1,90 @@
-[![Black Lives Matter!](https://api.ergodark.com/badges/blm "Join the movement!")](https://secure.actblue.com/donate/ms_blm_homepage_2019)
-[![Maintenance status](https://img.shields.io/maintenance/active/2021 "Is this package maintained?")](https://www.npmjs.com/package/babel-plugin-transform-mjs-imports)
-[![Last commit timestamp](https://img.shields.io/github/last-commit/xunnamius/babel-plugin-transform-mjs-imports "When was the last commit to the official repo?")](https://www.npmjs.com/package/babel-plugin-transform-mjs-imports)
-[![Open issues](https://img.shields.io/github/issues/xunnamius/babel-plugin-transform-mjs-imports "Number of known issues with this package")](https://www.npmjs.com/package/babel-plugin-transform-mjs-imports)
-[![Pull requests](https://img.shields.io/github/issues-pr/xunnamius/babel-plugin-transform-mjs-imports "Number of open pull requests")](https://www.npmjs.com/package/babel-plugin-transform-mjs-imports)
-[![DavidDM dependencies](https://img.shields.io/david/xunnamius/babel-plugin-transform-mjs-imports "Status of this package's dependencies")](https://david-dm.org/xunnamius/babel-plugin-transform-mjs-imports)
-[![Source license](https://img.shields.io/npm/l/babel-plugin-transform-mjs-imports "This package's source license")](https://www.npmjs.com/package/babel-plugin-transform-mjs-imports)
-[![NPM version](https://api.ergodark.com/badges/npm-pkg-version/babel-plugin-transform-mjs-imports "Install this package using npm or yarn!")](https://www.npmjs.com/package/babel-plugin-transform-mjs-imports)
+[![Black Lives Matter!](https://api.ergodark.com/badges/blm 'Join the movement!')](https://secure.actblue.com/donate/ms_blm_homepage_2019)
+[![Maintenance status](https://img.shields.io/maintenance/active/2021 'Is this package maintained?')](https://www.npmjs.com/package/babel-plugin-transform-default-named-imports)
+[![Last commit timestamp](https://img.shields.io/github/last-commit/xunnamius/babel-plugin-transform-default-named-imports 'When was the last commit to the official repo?')](https://www.npmjs.com/package/babel-plugin-transform-default-named-imports)
+[![Open issues](https://img.shields.io/github/issues/xunnamius/babel-plugin-transform-default-named-imports 'Number of known issues with this package')](https://www.npmjs.com/package/babel-plugin-transform-default-named-imports)
+[![Pull requests](https://img.shields.io/github/issues-pr/xunnamius/babel-plugin-transform-default-named-imports 'Number of open pull requests')](https://www.npmjs.com/package/babel-plugin-transform-default-named-imports)
+[![DavidDM dependencies](https://img.shields.io/david/xunnamius/babel-plugin-transform-default-named-imports "Status of this package's dependencies")](https://david-dm.org/xunnamius/babel-plugin-transform-default-named-imports)
+[![Source license](https://img.shields.io/npm/l/babel-plugin-transform-default-named-imports "This package's source license")](https://www.npmjs.com/package/babel-plugin-transform-default-named-imports)
+[![NPM version](https://api.ergodark.com/badges/npm-pkg-version/babel-plugin-transform-default-named-imports 'Install this package using npm or yarn!')](https://www.npmjs.com/package/babel-plugin-transform-default-named-imports)
 
-# babel-plugin-transform-mjs-imports
+# babel-plugin-transform-default-named-imports
 
-This Babel plugin transforms CJS named import declarations (which are allowed in
-TypeScript and [modern
-Node](https://nodejs.org/api/esm.html#esm_import_statements)) into [default CJS
-import declarations with constant destructuring assignments](#motivation) when
-emitting `.mjs` files.
+Patterns like the following are commonplace throughout the JavaScript ecosystem:
 
-The goal of this plugin is to stop Webpack and other bundlers from
-[choking](https://github.com/formatjs/formatjs/issues/1395) on `.mjs` files
-transpiled from TypeScript (`.ts`) and other sources that contain
-technically-invalid CJS named import syntax.
+```typescript
+// file: src/index.js
+const { name: pkgName } = require('../package.json');
+```
+
+With TypeScript and more modern JavaScript, we'd achieve the same with the
+following:
+
+```typescript
+// file: src/index.ts
+import { name as pkgName } from '../package.json';
+```
+
+However, running this through Webpack 5 will trigger warnings like
+`WARNING in ./src/xyz.ts 6:30-37 Should not import the named export 'name' (imported as 'pkgName') default-exporting module (only default export is available soon)`.
+Worse, running this snippet through Webpack 4 can cause bundling errors.
+
+This simple Babel plugin makes these warnings and errors go away by transforming
+named import declarations of CJS and JSON modules into
+[default import declarations with constant destructuring assignments](#motivation).
+The goal is to make named import sugar _forward-compatible_ by allowing imports
+of named CJS exports to remain consistent across CJS and ESM source, and to
+prevent some versions of Webpack, Node, browsers, et cetera from
+[choking](https://github.com/formatjs/formatjs/issues/1395) when encountering
+it.
 
 ## Installation and Usage
 
 ```Bash
-npm install --save-dev babel-plugin-transform-mjs-imports
+npm install --save-dev babel-plugin-transform-default-named-imports
 ```
 
 And in your `babel.config.js`:
 
-```JavaScript
+```typescript
 module.exports = {
-    plugins: ['babel-plugin-transform-mjs-imports'],
+  plugins: ['transform-default-named-imports']
 };
 ```
 
-And finally, run Babel:
+And finally, run Babel through your toolchain (Webpack, Jest, etc) or manually.
+For example:
 
 ```Bash
-babel src --extensions .ts --out-dir dist --out-file-extension .mjs
+npx babel src --out-dir dist
 ```
 
 By default, this plugin will transform named imports for Node's built-in
-packages (e.g. `http`, `url`, `path`) and any CJS package under `node_modules`
-(reported by
-[`webpack-node-module-types`](https://www.npmjs.com/package/webpack-node-module-types)).
+packages (e.g. `http`, `url`, `path`), JSON files, and any CJS package under
+`node_modules` classified as a CJS module by
+[`webpack-node-module-types`](https://www.npmjs.com/package/webpack-node-module-types).
+**All other imports, including local imports, are left untouched.**
 
 ### Custom Configuration
 
-Out of the box with zero configuration, the default settings look something like
-this:
+Out of the box with zero configuration, the default settings this plugin uses
+look something like the following:
 
-```JavaScript
+```typescript
 const { getModuleTypes } = require('webpack-node-module-types');
 
 module.exports = {
-    plugins: [
-        ['babel-plugin-transform-mjs-imports', {
-            test: [ ...getModuleTypes().cjs ], // ◄ match all CJS modules
-            exclude: [], // ◄ never excludes modules by default
-            transformBuiltins: true, // ◄ match all built-in modules
-            silent: true, // ◄ output results to stdout if silent == false
-            verbose: false, // ◄ output more detailed results if silent == false
-        }],
-    ],
+  plugins: [
+    [
+      'transform-default-named-imports',
+      {
+        test: [...getModuleTypes().cjs], // ◄ match all CJS modules
+        exclude: [], // ◄ never excludes modules by default
+        transformBuiltins: true, // ◄ match all built-in modules
+        silent: true, // ◄ output results to stdout if silent == false
+        verbose: false // ◄ output detailed results if silent == false
+      }
+    ]
+  ]
 };
 ```
 
@@ -74,36 +96,40 @@ imports with sources that match any item in `test` _and fail to match all items
 in `exclude`_ will be transformed. You can also skip transforming built-ins by
 default (unless they match in `test`) using `transformBuiltins: false`.
 
-For instance, if we want only to transform any imports (bare or deep) of
-`apollo-server` and any built-ins like `url` from the above example, my
+For instance, to exclusively transform any imports (bare or deep) of
+`apollo-server` and any built-ins like `url` from the above example,
 `babel.config.js` would include:
 
-```JavaScript
+```typescript
 module.exports = {
-    plugins: [
-        ['babel-plugin-transform-mjs-imports', {
-            // ▼ regex matches any import that starts with 'apollo-server'
-            test: [ /^apollo-server/ ],
-        }],
-    ],
+  plugins: [
+    [
+      'transform-default-named-imports',
+      {
+        // ▼ regex matches any import that starts with 'apollo-server'
+        test: [/^apollo-server/]
+      }
+    ]
+  ]
 };
 ```
 
 Replacing the `test` array like this also replaces the default list of CJS
-modules from `node_modules`. To append rather than replace, try something like:
+modules from `node_modules`. To append rather than replace, you can do something
+like the following:
 
 ```Bash
 npm install --save-dev webpack-node-module-types
 ```
 
-```JavaScript
+```typescript
 const { getModuleTypes } = require('webpack-node-module-types');
 
 module.exports = {
     plugins: [
-        ['babel-plugin-transform-mjs-imports', {
+        ['transform-default-named-imports', {
             // ▼ extend, rather than override, the default settings
-            test: test: [
+            test: [
               ...getModuleTypes().cjs,
               'another/source/path.js',
               'something-special'
@@ -119,28 +145,30 @@ misclassifies a package or you want to override the defaults.
 
 ## Motivation
 
-As of Node 14, there are at least two "gotcha" rules when writing JavaScript
-using `.mjs` files destined to be published in an NPM package:
+As of Node 14, there are at least two "gotcha" rules when writing ESM modules
+(files that end in `.mjs`):
 
-1. All import sources that are [not
-   bare](https://nodejs.org/api/esm.html#esm_import_specifiers) and not found in
-   [the package's `imports`/`exports` key][exports-main-key] **must include a
-   file extension**. This includes imports on directories e.g. `import { Button} from './component/button'`, which should appear in an `.mjs` file as `import { Button } from './component/button/index.mjs'`.
+1. All import sources that are
+   [not bare](https://nodejs.org/api/esm.html#esm_import_specifiers) and not
+   found in [the package's `imports`/`exports` key][exports-main-key] **must
+   include a file extension**. This includes imports on directories e.g.
+   `import { Button} from './component/button'`, which should appear in an
+   `.mjs` file as `import { Button } from './component/button/index.mjs'`.
 
 2. CJS modules can only be imported using **default import syntax**. As far as
-   Webpack 4 and (so far) Webpack 5 is concerned, this includes built-ins too.
-   For example, `import { parse } from 'url'` is illegal because `url` is
-   considered a CJS module.
+   Webpack is concerned, this includes built-ins too. For example,
+   `import { parse } from 'url'` is illegal because `url` is considered a CJS
+   module.
 
-Node 14 is lax with the second rule, going so far as to use [static
-analysis](https://nodejs.org/api/esm.html#esm_import_statements) to allow CJS
-modules to be imported using the "technically illegal" named import syntax.
-However, Webpack and other bundlers are much stricter about this and using named
-import syntax on a CJS module will cause bundling to fail outright.
+Node 14 is lax with the second rule, going so far as to use
+[static analysis](https://nodejs.org/api/esm.html#esm_import_statements) to
+allow CJS modules to be imported using the "technically illegal" named import
+syntax. However, Webpack and other bundlers are much stricter about this and
+using named import syntax on a CJS module can cause bundling to fail outright.
 
-For instance, suppose we use Babel to transpile this TypeScript file into the
-ESM entry point **`my-package.mjs`** for a [dual
-CJS2/ESM](https://nodejs.org/api/packages.html#packages_dual_commonjs_es_module_packages)
+For instance, suppose one uses Babel to transpile this TypeScript file into the
+ESM entry point **`my-package.mjs`** for a
+[dual CJS2/ESM](https://nodejs.org/api/packages.html#packages_dual_commonjs_es_module_packages)
 package:
 
 ```TypeScript
@@ -169,58 +197,67 @@ import { default as util2, util as smUtil, cliUtil } from 'some-package/dist/uti
 ```
 
 The above syntax, which is all legal in Node 14 and TypeScript, will survive
-transpilation when emitting `my-package.mjs`. Running this with `node my-package.mjs` works. Further, if we run this file as an entry point through
-Webpack (with babel-loader) and emit CJS bundle file **`my-package.js`**,
-running `node my-package.js` also works. Everything works, and `my-package.mjs`
-\+ `my-package.js` can be distributed as a dual CJS2/ESM package!
+transpilation when emitting `my-package.mjs`. Running this with
+`node my-package.mjs` works. Further, after running this file as an entry point
+through Webpack (with babel-loader) and emitting CJS bundle file
+**`my-package.js`**, running `node my-package.js` also works. Everything works,
+and `my-package.mjs` \+ `my-package.js` can be distributed as a dual CJS2/ESM
+package!
 
-Just one problem: when Webpack and other bundlers attempt to process this as a
-tree-shakable ESM package (using our `.mjs` entry point), they'll [choke and
-die](https://github.com/formatjs/formatjs/issues/1395) when they encounter the
-"illegal" CJS named imports. This usually manifests as strange errors like
-`ERROR in ./my-package.mjs Can't import the named export 'ApolloServer' from non EcmaScript module (only default export is available)` or `ERROR in ./node_modules/my-package/dist/my-package.mjs Can't import the named export 'parse' from non EcmaScript module (only default export is available)`.
+Just one problem: when Webpack attempts to process this as a tree-shakable ESM
+package (using our `.mjs` entry point), at worst it'll
+[choke and die](https://github.com/formatjs/formatjs/issues/1395) encountering
+the "illegal" CJS named imports. This manifests as strange errors like
+`ERROR in ./my-package.mjs Can't import the named export 'ApolloServer' from non EcmaScript module (only default export is available)`
+or
+`ERROR in ./node_modules/my-package/dist/my-package.mjs Can't import the named export 'parse' from non EcmaScript module (only default export is available)`.
+In more recent versions of Webpack, this can lead to similar warnings when
+transpiling TypeScript source.
 
-`babel-plugin-transform-mjs-imports` remedies this by transforming each named
-import of a CJS module into a default CJS import with a constant destructuring
-assignment of the named imports:
+`babel-plugin-transform-default-named-imports` remedies this by transforming
+each named import of a CJS module into a default CJS import with a constant
+destructuring assignment of the named imports:
 
-```JavaScript
-/* my-package.mjs (using babel-plugin-transform-mjs-imports) */
+```typescript
+/* my-package.mjs (using babel-plugin-transform-default-named-imports) */
 
 // ▼ #1: named CJS import (transformed)
-import _$apollo_server from "apollo-server"; // ◄ default import
+import _$apollo_server from 'apollo-server'; // ◄ default import
 const { ApolloServer, gql } = _$apollo_server; // ◄ destructuring assignment
 // ▼ #2: named ESM import (preserved)
-import { Button } from "ui-library/es";
+import { Button } from 'ui-library/es';
 // ▼ #3: named built-in import (transformed)
-import _$url from "url"; // ◄ default import
+import _$url from 'url'; // ◄ default import
 const { parse: parseUrl } = _$url; // ◄ destructuring assignment
 // ▼ #4: default and namespace CJS import (preserved)
-import lib, * as libNamespace from "cjs-component-library";
+import lib, * as libNamespace from 'cjs-component-library';
 // ▼ #5: default CJS import (preserved); named CJS import (transformed)
-import lib2 from "cjs2-component2-library2"; // ◄ default import (preserved)
+import lib2 from 'cjs2-component2-library2'; // ◄ default import (preserved)
 const { item1, item2 } = lib2; // ◄ destructuring assignment
 // ▼ #6: default CJS import (preserved)
-import lib3 from "cjs3-component3-library3";
+import lib3 from 'cjs3-component3-library3';
 // ▼ #7: namespace CJS import (preserved)
-import * as lib4 from "cjs4-component4-library4";
+import * as lib4 from 'cjs4-component4-library4';
 // ▼ #8: named ESM import (preserved) (eliminated by Webpack through bundling)
-import { util } from "../lib/module-utils.mjs";
+import { util } from '../lib/module-utils.mjs';
 // ▼ #9: named CJS import (default alias is preserved, rest is transformed)
-import util2 from "some-package/dist/utils.js";// ◄ default import (preserved)
+import util2 from 'some-package/dist/utils.js'; // ◄ default import (preserved)
 const { util: smUtil, cliUtil } = util2; // ◄ destructuring assignment
 ```
 
-Now, having `my-package` as a CJS-importing ESM (`.mjs`) dependency of a project
-we're bundling is no longer problematic! 🎉🎉🎉
+Now, having `my-package` import CJS modules as if they were ESM causes no
+warnings or errors! 🎉🎉🎉
 
-Hence, this transformation is useful for library authors shipping packages with
-ESM entry points as it prevents various bundlers from choking on delicious sugar
-like named imports of CJS modules in `.mjs` files. It's a solution to a
+Hence, this transformation is mainly useful for library authors shipping
+packages with ESM entry points as it prevents various bundlers from choking on
+delicious sugar like named imports of CJS modules. It's a solution to a
 different symptom of [this problem](https://github.com/babel/babel/issues/7294).
 
-This plugin is similar to (and inspired by)
-[babel-plugin-transform-default-import](https://www.npmjs.com/package/babel-plugin-transform-default-import).
+This plugin is somewhat similar to
+[babel-plugin-transform-default-import](https://www.npmjs.com/package/babel-plugin-transform-default-import)
+and
+[babel-plugin-transform-named-imports](https://github.com/SectorLabs/babel-plugin-transform-named-imports).
+You could say this plugin is the functional intersection of the aforementioned.
 
 ## Contributing
 
@@ -296,7 +333,10 @@ declarations file.
 
 See [CHANGELOG.md](CHANGELOG.md).
 
-[side-effects-key]: https://webpack.js.org/guides/tree-shaking/#mark-the-file-as-side-effect-free
-[exports-main-key]: https://github.com/nodejs/node/blob/8d8e06a345043bec787e904edc9a2f5c5e9c275f/doc/api/packages.md#package-entry-points
+[side-effects-key]:
+  https://webpack.js.org/guides/tree-shaking/#mark-the-file-as-side-effect-free
+[exports-main-key]:
+  https://github.com/nodejs/node/blob/8d8e06a345043bec787e904edc9a2f5c5e9c275f/doc/api/packages.md#package-entry-points
 [tree-shaking]: https://webpack.js.org/guides/tree-shaking
-[local-pkg]: https://github.com/nodejs/node/blob/8d8e06a345043bec787e904edc9a2f5c5e9c275f/doc/api/packages.md#type
+[local-pkg]:
+  https://github.com/nodejs/node/blob/8d8e06a345043bec787e904edc9a2f5c5e9c275f/doc/api/packages.md#type
