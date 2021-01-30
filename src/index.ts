@@ -95,7 +95,7 @@ const getMetadata = (state: State) => {
 
 export default function (): PluginObj<State> {
   return {
-    name: 'babel-plugin-transform-mjs-imports',
+    name: 'babel-plugin-transform-default-named-imports',
     visitor: {
       Program: {
         enter(_, state) {
