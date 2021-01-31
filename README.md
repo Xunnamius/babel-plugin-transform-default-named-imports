@@ -37,11 +37,6 @@ prevent some versions of Webpack, Node, browsers, et cetera from
 [choking](https://github.com/formatjs/formatjs/issues/1395) when encountering
 it.
 
-> Note that Webpack 5.18 does not properly tree-shake constant destructuring
-> assignments of JSON imports. Until Webpack's handling of JSON modules stabilizes,
-> [externalize](https://webpack.js.org/configuration/externals) any imported JSON
-> and/or ensure the output bundle size meets your expectations.
-
 ## Installation and Usage
 
 ```Bash
@@ -68,6 +63,27 @@ packages (e.g. `http`, `url`, `path`), for sources that end in `.json`, and for
 any CJS package under `node_modules` (determined by
 [`webpack-node-module-types`](https://www.npmjs.com/package/webpack-node-module-types)).
 **All other imports, including local imports, are left untouched.**
+
+### Importing JSON Modules
+
+As of version 5.18, Webpack does not properly tree-shake constant destructuring assignments
+of JSON imports without a little help. Until Webpack's handling of JSON modules stabilizes,
+[externalize all JSON imports as commonjs](https://webpack.js.org/configuration/externals):
+
+```typescript
+// file: webpack.config.js
+module.exports = {
+...
+  externals: [
+    ...
+    ({ request }, cb) =>
+      // ? Externalize all .json imports (required as commonjs modules)
+      /\.json$/.test(request) ? cb(null, `commonjs ${request}`) : cb()
+  ]
+};
+```
+
+If you do not externalize your JSON imports, you risk bloating your bundle size!
 
 ### Custom Configuration
 
