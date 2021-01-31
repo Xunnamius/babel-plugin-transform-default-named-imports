@@ -37,6 +37,11 @@ prevent some versions of Webpack, Node, browsers, et cetera from
 [choking](https://github.com/formatjs/formatjs/issues/1395) when encountering
 it.
 
+> Note that Webpack 5.18 does not properly tree-shake constant destructuring
+> assignments of JSON imports. Until Webpack's handling of JSON modules stabilizes,
+> [externalize](https://webpack.js.org/configuration/externals) any imported JSON
+> and/or ensure the output bundle size meets your expectations.
+
 ## Installation and Usage
 
 ```Bash
