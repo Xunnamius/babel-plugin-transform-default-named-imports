@@ -25,7 +25,7 @@ import { name as pkgName } from '../package.json';
 ```
 
 However, running this through Webpack 5 will trigger warnings like
-`WARNING in ./src/xyz.ts 6:30-37 Should not import the named export 'name' (imported as 'pkgName') default-exporting module (only default export is available soon)`.
+`WARNING in ./src/index.ts 6:30-37 Should not import the named export 'name' (imported as 'pkgName') default-exporting module (only default export is available soon)`.
 Worse, running this snippet through Webpack 4 can cause bundling errors.
 
 This simple Babel plugin makes these warnings and errors go away by transforming
@@ -91,14 +91,14 @@ Out of the box with zero configuration, the default settings this plugin uses
 look something like the following:
 
 ```typescript
-const { getModuleTypes } = require('webpack-node-module-types');
+const { determineModuleTypes } = require('webpack-node-module-types/sync');
 
 module.exports = {
   plugins: [
     [
       'transform-default-named-imports',
       {
-        test: [...getModuleTypes().cjs], // ◄ match all CJS modules
+        test: [...determineModuleTypes().cjs], // ◄ match all CJS modules
         exclude: [], // ◄ never excludes modules by default
         transformBuiltins: true, // ◄ match all built-in modules
         silent: true, // ◄ output results to stdout if silent == false
@@ -137,14 +137,16 @@ module.exports = {
 
 Replacing the `test` array like this also replaces the default list of CJS
 modules from `node_modules`. To append rather than replace, you can do something
-like the following:
+like the below. This is also useful when
+[`webpack-node-module-types`](https://www.npmjs.com/package/webpack-node-module-types)
+misclassifies a package or you want to override the defaults.
 
 ```Bash
 npm install --save-dev webpack-node-module-types
 ```
 
 ```typescript
-const { getModuleTypes } = require('webpack-node-module-types');
+const { determineModuleTypes } = require('webpack-node-module-types/sync');
 
 module.exports = {
   plugins: [
@@ -153,8 +155,10 @@ module.exports = {
       {
         // ▼ extend, rather than override, the default settings
         test: [
-          ...getModuleTypes().cjs,
-          'another/source/path.js',
+          // ▼ prevent `next` and any deep import like `next/dist/next-server`
+          // ▼ from being misclassified
+          ...determineModuleTypes().cjs.filter((p) => !/^next([/?#].+)?/.test(p)),
+          // ▼ add misclassified `something-special` package to be transformed
           'something-special'
         ]
       }
@@ -162,10 +166,6 @@ module.exports = {
   ]
 };
 ```
-
-This is also useful when
-[`webpack-node-module-types`](https://www.npmjs.com/package/webpack-node-module-types)
-misclassifies a package or you want to override the defaults.
 
 ## Motivation
 
@@ -228,8 +228,8 @@ through Webpack (with babel-loader) and emitting CJS bundle file
 and `my-package.mjs` \+ `my-package.js` can be distributed as a dual CJS2/ESM
 package!
 
-Just one problem: when Webpack attempts to process this as a tree-shakable ESM
-package (using our `.mjs` entry point), at worst it'll
+Problem: when Webpack attempts to process this as a tree-shakable ESM package
+(using our `.mjs` entry point), at worst it'll
 [choke and die](https://github.com/formatjs/formatjs/issues/1395) encountering
 the "illegal" CJS named imports. This manifests as strange errors like
 `ERROR in ./my-package.mjs Can't import the named export 'ApolloServer' from non EcmaScript module (only default export is available)`
@@ -238,9 +238,9 @@ or
 In more recent versions of Webpack, this can lead to similar warnings when
 transpiling TypeScript source.
 
-`babel-plugin-transform-default-named-imports` remedies this by transforming
-each named import of a CJS module into a default CJS import with a constant
-destructuring assignment of the named imports:
+`babel-plugin-transform-default-named-imports` remedies this and similar issues
+by transforming each named import of a CJS module into a default CJS import with
+a constant destructuring assignment of the named imports:
 
 ```typescript
 /* my-package.mjs (using babel-plugin-transform-default-named-imports) */
@@ -270,7 +270,7 @@ const { util: smUtil, cliUtil } = util2; // ◄ destructuring assignment
 ```
 
 Now, having `my-package` import CJS modules as if they were ESM causes no
-warnings or errors! 🎉🎉🎉
+warnings or errors! 🎉
 
 Hence, this transformation is mainly useful for library authors shipping
 packages with ESM entry points as it prevents various bundlers from choking on
