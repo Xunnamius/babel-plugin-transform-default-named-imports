@@ -66,8 +66,9 @@ any CJS package under `node_modules` (determined by
 
 ### Importing JSON Modules
 
-As of version 5.18, Webpack does not properly tree-shake constant destructuring assignments
-of JSON imports without a little help. Until Webpack's handling of JSON modules stabilizes,
+As of version 5.18, Webpack does not properly tree-shake constant destructuring
+assignments of JSON imports without a little help. Until Webpack's handling of
+JSON modules stabilizes,
 [externalize all JSON imports as commonjs](https://webpack.js.org/configuration/externals):
 
 ```typescript
@@ -137,9 +138,7 @@ module.exports = {
 
 Replacing the `test` array like this also replaces the default list of CJS
 modules from `node_modules`. To append rather than replace, you can do something
-like the below. This is also useful when
-[`webpack-node-module-types`](https://www.npmjs.com/package/webpack-node-module-types)
-misclassifies a package or you want to override the defaults.
+like:
 
 ```Bash
 npm install --save-dev webpack-node-module-types
@@ -156,9 +155,11 @@ module.exports = {
         // ▼ extend, rather than override, the default settings
         test: [
           // ▼ prevent `next` and any deep import like `next/dist/next-server`
-          // ▼ from being misclassified
-          ...determineModuleTypes().cjs.filter((p) => !/^next([/?#].+)?/.test(p)),
-          // ▼ add misclassified `something-special` package to be transformed
+          // ▼ from being misclassified as CJS
+          ...determineModuleTypes().cjs.filter(
+            (p) => !/^next([/?#].+)?/.test(p)
+          ),
+          // ▼ add CJS package `something-special` misclassified as ESM
           'something-special'
         ]
       }
@@ -166,6 +167,26 @@ module.exports = {
   ]
 };
 ```
+
+If all you want to do is ignore a misclassified module like `next` in the above
+example, it's easier to just _exclude_ it:
+
+```typescript
+module.exports = {
+  plugins: [
+    [
+      'transform-default-named-imports',
+      {
+        exclude: [/^next([/?#].+)?/]
+      }
+    ]
+  ]
+};
+```
+
+This is useful when
+[`webpack-node-module-types`](https://www.npmjs.com/package/webpack-node-module-types)
+misclassifies a package or you want to override the defaults.
 
 ## Motivation
 
