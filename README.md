@@ -3,7 +3,6 @@
 [![Last commit timestamp](https://img.shields.io/github/last-commit/xunnamius/babel-plugin-transform-default-named-imports 'When was the last commit to the official repo?')](https://www.npmjs.com/package/babel-plugin-transform-default-named-imports)
 [![Open issues](https://img.shields.io/github/issues/xunnamius/babel-plugin-transform-default-named-imports 'Number of known issues with this package')](https://www.npmjs.com/package/babel-plugin-transform-default-named-imports)
 [![Pull requests](https://img.shields.io/github/issues-pr/xunnamius/babel-plugin-transform-default-named-imports 'Number of open pull requests')](https://www.npmjs.com/package/babel-plugin-transform-default-named-imports)
-[![DavidDM dependencies](https://img.shields.io/david/xunnamius/babel-plugin-transform-default-named-imports "Status of this package's dependencies")](https://david-dm.org/xunnamius/babel-plugin-transform-default-named-imports)
 [![Source license](https://img.shields.io/npm/l/babel-plugin-transform-default-named-imports "This package's source license")](https://www.npmjs.com/package/babel-plugin-transform-default-named-imports)
 [![NPM version](https://api.ergodark.com/badges/npm-pkg-version/babel-plugin-transform-default-named-imports 'Install this package using npm or yarn!')](https://www.npmjs.com/package/babel-plugin-transform-default-named-imports)
 
