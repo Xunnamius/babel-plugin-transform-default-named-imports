@@ -168,8 +168,10 @@ module.exports = {
 };
 ```
 
-If all you want to do is ignore a misclassified module like `next` in the above
-example, it's easier to just _exclude_ it:
+### Troubleshooting
+
+If all you want to do is ignore a misclassified module like `next` in the
+previous section, it's easier to just _exclude_ it:
 
 ```typescript
 module.exports = {
@@ -186,7 +188,20 @@ module.exports = {
 
 This is useful when
 [`webpack-node-module-types`](https://www.npmjs.com/package/webpack-node-module-types)
-misclassifies a package or you want to override the defaults.
+misclassifies a package or you want to more easily override the defaults.
+
+A clue that a package is being misclassified is when you encounter errors like
+`TypeError: Cannot destructure property 'X' of '_X.default' as it is undefined.`
+For example, in the case of the following deep `next` import:
+
+```typescript
+import { apiResolver } from 'next/dist/next-server/server/api-utils.js';
+```
+
+Without adding the `exclude` configuration key above, Webpack 5.20 reports the
+following error:
+`TypeError: Cannot destructure property 'apiResolver' of '_apiUtils.default' as it is undefined.`
+After adding the `exclude` key, this error disappears.
 
 ## Motivation
 
