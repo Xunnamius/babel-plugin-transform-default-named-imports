@@ -101,11 +101,18 @@ module.exports = {
     [
       'transform-default-named-imports',
       {
-        test: [...determineModuleTypes().cjs], // ◄ match all CJS modules
+        test: [
+          // ▼ match all CJS modules, even deep imports: require('pkg/d/e/e/p')
+          ...determineModuleTypes().cjs.map(strToOpenEndedRegex),
+          // ▼ match JSON modules, including relative imports
+          /^(\.(\.)?\/)+(.+)\.json$/
+        ],
+        include: [], // ◄ these module names are appended to the `test` array
         exclude: [], // ◄ never excludes modules by default
         transformBuiltins: true, // ◄ match all built-in modules
         silent: true, // ◄ output results to stdout if silent == false
-        verbose: false // ◄ output detailed results if silent == false
+        verbose: false, // ◄ output detailed results if silent == false
+        monorepo: false // ◄ enable this plugin to work in a monorepo context
       }
     ]
   ]
@@ -120,7 +127,7 @@ imports with sources that match any item in `test` _and fail to match all items
 in `exclude`_ will be transformed. You can also skip transforming built-ins by
 default (unless they match in `test`) using `transformBuiltins: false`.
 
-For instance, to exclusively transform any imports (bare or deep) of
+For instance, to _exclusively_ transform any imports (bare or deep) of
 `apollo-server` and any built-ins like `url` from the above example,
 `babel.config.js` would include:
 
@@ -173,13 +180,14 @@ module.exports = {
 #### Monorepo Support
 
 If you're running this babel plugin within a monorepo, consider using the
+`monorepo: true` option. This enables the
 [`root mode`](https://github.com/Xunnamius/webpack-node-module-types#monorepo-support)
-functionality of the underlying `webpack-node-module-types` package. This will
-ensure `node_module` directories in parent directories are detected and errors
-are prevented when `node_modules` is not found locally, as is often the case
-with sub-packages in monorepos.
+functionality of the underlying `webpack-node-module-types` package, ensuring a
+`node_module` directory in some parent directory is detected. Additionally,
+errors are prevented when `node_modules` is not found in the current working
+directory, as is often the case with sub-packages in monorepos.
 
-For example:
+Example:
 
 ```typescript
 const { determineModuleTypes } = require('webpack-node-module-types/sync');
@@ -190,7 +198,7 @@ module.exports = {
       'transform-default-named-imports',
       {
         // ▼ enable monorepo support when cwd() === sub-dir within monorepo
-        test: determineModuleTypes({ rootMode: 'upward' }).cjs
+        monorepo: true
       }
     ]
   ]
@@ -198,6 +206,10 @@ module.exports = {
 ```
 
 ### Troubleshooting
+
+Firstly, this package uses the [`debug`](https://www.npmjs.com/package/debug)
+package under the hood, so running babel with the `DEBUG='*:*'` environment
+variable set will yield all sorts of useful information to your CLI.
 
 If all you want to do is ignore a misclassified module like `next` in the
 previous section, it's easier to just _exclude_ it:
@@ -231,6 +243,41 @@ Without adding the `exclude` configuration key above, Webpack `5.20` reports the
 following error:
 `TypeError: Cannot destructure property 'apiResolver' of '_apiUtils.default' as it is undefined.`
 After adding the `exclude` key, this error disappears.
+
+Similarly, rather than add `webpack-node-module-types` as a dependency and
+overwrite the entire `test` array just to add a few package names, you can use
+`include` to append a module name or regex instead, ensuring it is included in
+the final list of CJS modules:
+
+```typescript
+module.exports = {
+  plugins: [
+    [
+      'transform-default-named-imports',
+      {
+        include: ['package']
+      }
+    ]
+  ]
+};
+```
+
+Instead of:
+
+```typescript
+const { determineModuleTypes } = require('webpack-node-module-types/sync');
+
+module.exports = {
+  plugins: [
+    [
+      'transform-default-named-imports',
+      {
+        test: [...determineModuleTypes().cjs, 'package']
+      }
+    ]
+  ]
+};
+```
 
 ## Motivation
 
