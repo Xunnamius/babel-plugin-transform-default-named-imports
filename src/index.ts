@@ -7,6 +7,7 @@ import * as util from '@babel/types';
 export type Options = {
   opts: {
     test?: string[];
+    include?: string[];
     exclude?: string[];
     transformBuiltins?: boolean;
     silent?: boolean;
@@ -84,7 +85,8 @@ const getMetadata = (state: State) => {
     transformed: [],
     iTests: [
       ...(state.opts.transformBuiltins !== false ? getBuiltinInclusionTests() : []),
-      ...(state.opts.test?.map(strToRegex) || getDefaultInclusionTests())
+      ...(state.opts.test?.map(strToRegex) || getDefaultInclusionTests()),
+      ...(state.opts.include?.map(strToRegex) || [])
     ],
     eTests: state.opts.exclude?.map(strToRegex) || []
   });
