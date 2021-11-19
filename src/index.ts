@@ -12,6 +12,7 @@ export type Options = {
     transformBuiltins?: boolean;
     silent?: boolean;
     verbose?: boolean;
+    monorepo?: boolean;
   };
 };
 
@@ -51,11 +52,13 @@ const stringToRegex = (str: string | RegExp, openEnded: boolean) => {
 const strToRegex = (str: string | RegExp) => stringToRegex(str, false);
 const strToOpenEndedRegex = (str: string | RegExp) => stringToRegex(str, true);
 
-const getDefaultInclusionTests = () => {
+const getDefaultInclusionTests = (monorepo: boolean) => {
   return (cache.cjsNodeModules = cache.cjsNodeModules.length
     ? cache.cjsNodeModules
     : [
-        ...determineModuleTypes().cjs.map(strToOpenEndedRegex),
+        ...determineModuleTypes({ rootMode: monorepo ? 'upward' : 'local' }).cjs.map(
+          strToOpenEndedRegex
+        ),
         /^(\.(\.)?\/)+(.+)\.json$/
       ]);
 };
@@ -85,7 +88,8 @@ const getMetadata = (state: State) => {
     transformed: [],
     iTests: [
       ...(state.opts.transformBuiltins !== false ? getBuiltinInclusionTests() : []),
-      ...(state.opts.test?.map(strToRegex) || getDefaultInclusionTests()),
+      ...(state.opts.test?.map(strToRegex) ||
+        getDefaultInclusionTests(!!state.opts.monorepo)),
       ...(state.opts.include?.map(strToRegex) || [])
     ],
     eTests: state.opts.exclude?.map(strToRegex) || []
