@@ -18,5 +18,7 @@ const result2 = lib2.a(true);
 const result3 = async () => lib3.a(true);
 
 export { ApolloServer as A, gql as B };
-export default Button.create(parseUrl(lib4.merge(util.lib, util2(smUtil, cliUtil))));
+export default Button.create(
+  parseUrl(lib4.merge(util.lib, util2(smUtil, cliUtil)))
+);
 export { result1, result2, result3, libNamespace, item1, item2 };
