@@ -1,3 +1,3 @@
-import apollo from 'apollo-server'
+import apollo from 'apollo-server';
 
 void apollo;

@@ -1,2 +1,2 @@
-import { util } from "../lib/module-utils.mjs";
+import { util } from '../lib/module-utils.mjs';
 void util;

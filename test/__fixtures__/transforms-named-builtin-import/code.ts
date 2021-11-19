@@ -1,3 +1,3 @@
-import { parse as parseUrl } from 'url'
+import { parse as parseUrl } from 'url';
 
 void parseUrl;

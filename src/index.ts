@@ -69,8 +69,7 @@ const getBuiltinInclusionTests = () => {
  * Return `source` as an alphanumeric string with underscores replacing
  * non-alphanumeric characters
  */
-const makeSpecifierFrom = (source: string) =>
-  '_$' + source.replace(/[^a-z0-9]/gi, '_');
+const makeSpecifierFrom = (source: string) => '_$' + source.replace(/[^a-z0-9]/gi, '_');
 
 const isCjs = (src: string, state: State) => {
   const { iTests, eTests } = getMetadata(state);
@@ -84,9 +83,7 @@ const getMetadata = (state: State) => {
     total: 0,
     transformed: [],
     iTests: [
-      ...(state.opts.transformBuiltins !== false
-        ? getBuiltinInclusionTests()
-        : []),
+      ...(state.opts.transformBuiltins !== false ? getBuiltinInclusionTests() : []),
       ...(state.opts.test?.map(strToRegex) || getDefaultInclusionTests())
     ],
     eTests: state.opts.exclude?.map(strToRegex) || []
@@ -95,7 +92,7 @@ const getMetadata = (state: State) => {
 
 export default function (): PluginObj<State> {
   return {
-    name: 'babel-plugin-transform-default-named-imports',
+    name: 'transform-default-named-imports',
     visitor: {
       Program: {
         enter(_, state) {
@@ -163,9 +160,7 @@ export default function (): PluginObj<State> {
         );
 
         // ? Transform the import into a default CJS import
-        path.node.specifiers = [
-          util.importDefaultSpecifier(newDefaultSpecifier)
-        ];
+        path.node.specifiers = [util.importDefaultSpecifier(newDefaultSpecifier)];
 
         // ? Insert a constant destructing assignment after
 

@@ -1,6 +1,6 @@
-import util2 from "some-package/dist/utils.js";
+import util2 from 'some-package/dist/utils.js';
 const { util: smUtil, cliUtil } = util2;
-import d from "http";
+import d from 'http';
 const { default: x, xx: yy, xxx } = d;
 void util2;
 void smUtil;
