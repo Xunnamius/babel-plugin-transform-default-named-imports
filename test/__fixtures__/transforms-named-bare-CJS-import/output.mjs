@@ -1,4 +1,4 @@
-import _$apollo_server from 'apollo-server';
-const { ApolloServer, gql } = _$apollo_server;
+import _apolloServer from 'apollo-server';
+const { ApolloServer, gql } = _apolloServer;
 void ApolloServer;
 void gql;

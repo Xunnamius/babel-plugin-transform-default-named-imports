@@ -1,10 +1,10 @@
-import _$apollo_server from 'apollo-server';
-const { ApolloServer, gql } = _$apollo_server;
+import _apolloServer from 'apollo-server';
+const { ApolloServer, gql } = _apolloServer;
 import { ApolloServer2, gql2 } from 'pollo-serve';
-import _$my_soft_w4re from 'my$soft-w4re';
-const { ApolloServer3, gql3 } = _$my_soft_w4re;
-import _$some_other_server from 'some-other-server';
-const { ApolloServer4, gql4 } = _$some_other_server;
+import _my$softW4re from 'my$soft-w4re';
+const { ApolloServer3, gql3 } = _my$softW4re;
+import _someOtherServer from 'some-other-server';
+const { ApolloServer4, gql4 } = _someOtherServer;
 void ApolloServer;
 void ApolloServer2;
 void ApolloServer3;

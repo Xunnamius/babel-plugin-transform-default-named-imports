@@ -1,8 +1,8 @@
-import _apollo_server2 from 'apollo-server';
-const { ApolloServer, gql } = _apollo_server2;
-const _$apollo_server = 'already defined';
+import _apolloServer2 from 'apollo-server';
+const { ApolloServer, gql } = _apolloServer2;
 const _apollo_server = 'already defined';
+const _apolloServer = 'already defined';
 void ApolloServer;
-void _$apollo_server;
 void _apollo_server;
+void _apolloServer;
 void gql;

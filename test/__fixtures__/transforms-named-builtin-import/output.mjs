@@ -1,3 +1,3 @@
-import _$url from 'url';
-const { parse: parseUrl } = _$url;
+import _url from 'url';
+const { parse: parseUrl } = _url;
 void parseUrl;

@@ -69,12 +69,6 @@ const getBuiltinInclusionTests = () => {
     : builtinModules.map(strToOpenEndedRegex));
 };
 
-/**
- * Return `source` as an alphanumeric string with underscores replacing
- * non-alphanumeric characters
- */
-const makeSpecifierFrom = (source: string) => '_$' + source.replace(/[^a-z0-9]/gi, '_');
-
 const isCjs = (src: string, state: State) => {
   const { iTests, eTests } = getMetadata(state);
   return iTests.some((r) => r.test(src)) && eTests.every((r) => !r.test(src));
@@ -162,7 +156,7 @@ export default function (): PluginObj<State> {
         const newDefaultSpecifier = util.identifier(
           specifiers.explicitDefault ||
             specifiers.implicitDefault ||
-            makeSpecifierFrom(source)
+            path.scope.generateUid(source)
         );
 
         // ? Transform the import into a default CJS import

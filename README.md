@@ -358,13 +358,13 @@ a constant destructuring assignment of the named imports:
 /* my-package.mjs (using babel-plugin-transform-default-named-imports) */
 
 // ▼ #1: named CJS import (transformed)
-import _$apollo_server from 'apollo-server'; // ◄ default import
-const { ApolloServer, gql } = _$apollo_server; // ◄ destructuring assignment
+import _apolloServer from 'apollo-server'; // ◄ default import
+const { ApolloServer, gql } = _apolloServer; // ◄ destructuring assignment
 // ▼ #2: named ESM import (preserved)
 import { Button } from 'ui-library/es';
 // ▼ #3: named built-in import (transformed)
-import _$url from 'url'; // ◄ default import
-const { parse: parseUrl } = _$url; // ◄ destructuring assignment
+import _url from 'url'; // ◄ default import
+const { parse: parseUrl } = _url; // ◄ destructuring assignment
 // ▼ #4: default and namespace CJS import (preserved)
 import lib, * as libNamespace from 'cjs-component-library';
 // ▼ #5: default CJS import (preserved); named CJS import (transformed)

@@ -1,8 +1,8 @@
-import _$apollo_server from 'apollo-server';
-const { ApolloServer, gql } = _$apollo_server;
+import _apolloServer from 'apollo-server';
+const { ApolloServer, gql } = _apolloServer;
 import { Button } from 'ui-library/es';
-import _$url from 'url';
-const { parse: parseUrl } = _$url;
+import _url from 'url';
+const { parse: parseUrl } = _url;
 import lib, * as libNamespace from 'cjs-component-library';
 import lib2 from 'cjs2-component2-library2';
 const { item1, item2 } = lib2;
