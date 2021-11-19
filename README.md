@@ -50,6 +50,9 @@ module.exports = {
 };
 ```
 
+> Keep in mind
+> [plugin order matters with Babel](https://babeljs.io/docs/en/plugins#plugin-ordering)!
+
 And finally, run Babel through your toolchain (Webpack, Jest, etc) or manually.
 For example:
 
@@ -65,9 +68,9 @@ any CJS package under `node_modules` (determined by
 
 ### Importing JSON Modules
 
-As of version 5.18, Webpack does not properly tree-shake constant destructuring
-assignments of JSON imports without a little help. Until Webpack's handling of
-JSON modules stabilizes,
+As of version `5.18`, Webpack does not properly tree-shake constant
+destructuring assignments of JSON imports without a little help. Until Webpack's
+handling of JSON modules stabilizes,
 [externalize all JSON imports as commonjs](https://webpack.js.org/configuration/externals):
 
 ```typescript
@@ -167,6 +170,33 @@ module.exports = {
 };
 ```
 
+#### Monorepo Support
+
+If you're running this babel plugin within a monorepo, consider using the
+[`root mode`](https://github.com/Xunnamius/webpack-node-module-types#monorepo-support)
+functionality of the underlying `webpack-node-module-types` package. This will
+ensure `node_module` directories in parent directories are detected and errors
+are prevented when `node_modules` is not found locally, as is often the case
+with sub-packages in monorepos.
+
+For example:
+
+```typescript
+const { determineModuleTypes } = require('webpack-node-module-types/sync');
+
+module.exports = {
+  plugins: [
+    [
+      'transform-default-named-imports',
+      {
+        // ▼ enable monorepo support when cwd() === sub-dir within monorepo
+        test: determineModuleTypes({ rootMode: 'upward' }).cjs
+      }
+    ]
+  ]
+};
+```
+
 ### Troubleshooting
 
 If all you want to do is ignore a misclassified module like `next` in the
@@ -197,7 +227,7 @@ For example, in the case of the following deep `next` import:
 import { apiResolver } from 'next/dist/next-server/server/api-utils.js';
 ```
 
-Without adding the `exclude` configuration key above, Webpack 5.20 reports the
+Without adding the `exclude` configuration key above, Webpack `5.20` reports the
 following error:
 `TypeError: Cannot destructure property 'apiResolver' of '_apiUtils.default' as it is undefined.`
 After adding the `exclude` key, this error disappears.
@@ -324,73 +354,6 @@ You could say this plugin is the functional intersection of the aforementioned.
 you submit a pull request, take care to maintain the existing coding style and
 add unit tests for any new or changed functionality. Please lint and test your
 code, of course!
-
-### NPM Scripts
-
-Run `npm run list-tasks` to see which of the following scripts are available for
-this project.
-
-> Using these scripts requires a linux-like development environment. None of the
-> scripts are likely to work on non-POSIX environments. If you're on Windows,
-> use [WSL](https://docs.microsoft.com/en-us/windows/wsl/install-win10).
-
-#### Development
-
-- `npm run repl` to run a buffered TypeScript-Babel REPL
-- `npm test` to run the unit tests and gather test coverage data
-  - Look for HTML files under `coverage/`
-- `npm run check-build` to run the integration tests
-- `npm run check-types` to run a project-wide type check
-- `npm run test-repeat` to run the entire test suite 100 times
-  - Good for spotting bad async code and heisenbugs
-  - Uses `__test-repeat` NPM script under the hood
-- `npm run dev` to start a development server or instance
-- `npm run generate` to transpile config files (under `config/`) from scratch
-- `npm run regenerate` to quickly re-transpile config files (under `config/`)
-
-#### Building
-
-- `npm run clean` to delete all build process artifacts
-- `npm run build` to compile `src/` into `dist/`, which is what makes it into
-  the published package
-- `npm run build-docs` to re-build the documentation
-- `npm run build-externals` to compile `external-scripts/` into
-  `external-scripts/bin/`
-- `npm run build-stats` to gather statistics about Webpack (look for
-  `bundle-stats.json`)
-
-#### Publishing
-
-- `npm run start` to start a production instance
-- `npm run fixup` to run pre-publication tests, rebuilds (like documentation),
-  and validations
-  - Triggered automatically by
-    [publish-please](https://www.npmjs.com/package/publish-please)
-
-#### NPX
-
-- `npx publish-please` to publish the package
-- `npx sort-package-json` to consistently sort `package.json`
-- `npx npm-force-resolutions` to forcefully patch security audit problems
-
-## Package Details
-
-> You don't need to read this section to use this package, everything should
-> "just work"!
-
-This is a simple [CJS2](https://github.com/webpack/webpack/issues/1114) package
-with a default export.
-
-[`package.json`](package.json) includes the [`exports` and
-`main`][exports-main-key] keys, which point to the CJS2 entry point, the
-[`type`][local-pkg] key, which is `commonjs`, and the
-[`sideEffects`][side-effects-key] key, which is `false` for [optimal tree
-shaking][tree-shaking], and the `types` key, which points to a TypeScript
-declarations file.
-
-## Release History
-
-See [CHANGELOG.md](CHANGELOG.md).
 
 [side-effects-key]:
   https://webpack.js.org/guides/tree-shaking/#mark-the-file-as-side-effect-free
