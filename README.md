@@ -180,18 +180,16 @@ module.exports = {
 #### Monorepo Support
 
 If you're running this babel plugin within a monorepo, consider using the
-`monorepo: true` option. This enables the
-[`root mode`](https://github.com/Xunnamius/webpack-node-module-types#monorepo-support)
+`monorepo` option. When `true`, this enables the
+[`"upward" root mode`](https://github.com/Xunnamius/webpack-node-module-types#monorepo-support)
 functionality of the underlying `webpack-node-module-types` package, ensuring a
 `node_module` directory in some parent directory is detected. Additionally,
 errors are prevented when `node_modules` is not found in the current working
 directory, as is often the case with sub-packages in monorepos.
 
-Example:
+Examples:
 
 ```typescript
-const { determineModuleTypes } = require('webpack-node-module-types/sync');
-
 module.exports = {
   plugins: [
     [
@@ -204,6 +202,26 @@ module.exports = {
   ]
 };
 ```
+
+```typescript
+module.exports = {
+  plugins: [
+    [
+      'transform-default-named-imports',
+      {
+        // ▼ enable monorepo support when cwd() === monorepo root
+        monorepo: './packages/pkg-1/node_modules'
+      }
+    ]
+  ]
+};
+```
+
+> The leading dot (`./` or `../`) in the relative path version is **important**!
+
+> Note that, if specifying a relative `node_modules` path, the path must point
+> to an existing directory or an error will be thrown. Use conditional logic if
+> the path might not exist at runtime.
 
 ### Troubleshooting
 

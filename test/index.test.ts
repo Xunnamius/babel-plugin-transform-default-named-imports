@@ -15,8 +15,8 @@ const babelOptions = {
       {
         // ? https://github.com/babel/babel-loader/issues/521#issuecomment-441466991
         modules: false,
-        // ? https://nodejs.org/en/about/releases
-        targets: { node: '10.13.0' }
+        // ? https://nodejs.org/en/about/releases (see `npm show` lts version)
+        targets: { node: '12.22.7' }
       }
     ],
     ['@babel/preset-typescript', { allowDeclareFields: true }]
