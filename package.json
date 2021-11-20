@@ -54,7 +54,7 @@
   "dependencies": {
     "@babel/core": "^7.16.0",
     "@babel/types": "^7.16.0",
-    "webpack-node-module-types": "^1.1.1"
+    "webpack-node-module-types": "^1.2.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.16.0",
