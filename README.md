@@ -23,20 +23,20 @@ following:
 import { name as pkgName } from '../package.json';
 ```
 
-However, running this through Webpack 5 will trigger warnings like
+However, running this through Webpack will trigger warnings like
 `WARNING in ./src/index.ts 6:30-37 Should not import the named export 'name' (imported as 'pkgName') default-exporting module (only default export is available soon)`.
-Worse, running this snippet through Webpack 4 can cause bundling errors.
 
 This simple Babel plugin makes these warnings and errors go away by transforming
 named import declarations of CJS and JSON modules into
 [default import declarations with constant destructuring assignments](#motivation).
-The goal is to make named import sugar _forward-compatible_ by allowing imports
-of named CJS exports to remain consistent across CJS and ESM source, and to
-prevent some versions of Webpack, Node, browsers, et cetera from
+The goal is to make that delicious `const { ... } = require(...)` sugar
+_forward-compatible_ by allowing imports of named CJS exports to remain
+consistent across CJS and ESM source, and to prevent some versions of Webpack,
+Node, browsers, et cetera from
 [choking](https://github.com/formatjs/formatjs/issues/1395) when encountering
 it.
 
-## Installation and Usage
+## Installation
 
 ```Bash
 npm install --save-dev babel-plugin-transform-default-named-imports
@@ -60,6 +60,8 @@ For example:
 npx babel src --out-dir dist
 ```
 
+## Usage
+
 By default, this plugin will transform named imports for Node's built-in
 packages (e.g. `http`, `url`, `path`), for sources that end in `.json`, and for
 any CJS package under `node_modules` (determined by
@@ -68,7 +70,7 @@ any CJS package under `node_modules` (determined by
 
 ### Importing JSON Modules
 
-As of version `5.18`, Webpack does not properly tree-shake constant
+As of `webpack@5.18`, Webpack does not properly tree-shake constant
 destructuring assignments of JSON imports without a little help. Until Webpack's
 handling of JSON modules stabilizes,
 [externalize all JSON imports as commonjs](https://webpack.js.org/configuration/externals):
@@ -180,14 +182,18 @@ module.exports = {
 #### Monorepo Support
 
 If you're running this babel plugin within a monorepo, consider using the
-`monorepo` option. When `true`, this enables the
-[`"upward" root mode`](https://github.com/Xunnamius/webpack-node-module-types#monorepo-support)
-functionality of the underlying `webpack-node-module-types` package, ensuring a
-`node_module` directory in some parent directory is detected. Additionally,
-errors are prevented when `node_modules` is not found in the current working
-directory, as is often the case with sub-packages in monorepos.
+`monorepo` option. This enables either the
+[_upward_](https://github.com/Xunnamius/webpack-node-module-types#monorepo-support)
+or
+[_relative_](https://github.com/Xunnamius/webpack-node-module-types#monorepo-support)
+root mode functionality of the underlying `webpack-node-module-types` package.
 
-Examples:
+When `monorepo` is set to `true`, upward root mode is used. This looks for the
+closest `node_modules` directory within any ancestor directory and throws if it
+doesn't exist; errors are prevented when a "local" `node_modules` is not found
+in the current working directory.
+
+Example:
 
 ```typescript
 module.exports = {
@@ -203,6 +209,13 @@ module.exports = {
 };
 ```
 
+Inversely, when `monorepo` is set to a relative path string, relative root mode
+is used. This looks for a `node_modules` directory at said path, but no error is
+thrown if it does not exist. Instead, the current working directory must contain
+a "local" `node_modules` directory or an error will be thrown.
+
+Example:
+
 ```typescript
 module.exports = {
   plugins: [
@@ -217,17 +230,15 @@ module.exports = {
 };
 ```
 
-> The leading dot (`./` or `../`) in the relative path version is **important**!
-
-> Note that, if specifying a relative `node_modules` path, the path must point
-> to an existing directory or an error will be thrown. Use conditional logic if
-> the path might not exist at runtime.
+> The leading dot (`./` or `../`) in the relative path version is **required**!
 
 ### Troubleshooting
 
 Firstly, this package uses the [`debug`](https://www.npmjs.com/package/debug)
 package under the hood, so running babel with the `DEBUG='*:*'` environment
 variable set will yield all sorts of useful information to your CLI.
+
+#### _Excluding_ Misclassified Packages
 
 If all you want to do is ignore a misclassified module like `next` in the
 previous section, it's easier to just _exclude_ it:
@@ -262,10 +273,13 @@ following error:
 `TypeError: Cannot destructure property 'apiResolver' of '_apiUtils.default' as it is undefined.`
 After adding the `exclude` key, this error disappears.
 
-Similarly, rather than add `webpack-node-module-types` as a dependency and
-overwrite the entire `test` array just to add a few package names, you can use
-`include` to append a module name or regex instead, ensuring it is included in
-the final list of CJS modules:
+#### _Including_ Special Packages
+
+Similar to `exclude`, you can use `include` to append a module name or regex to
+the final list of CJS modules rather than adding `webpack-node-module-types` as
+a dependency and necessarily overwriting the entire `test` array.
+
+This:
 
 ```typescript
 module.exports = {
@@ -280,7 +294,7 @@ module.exports = {
 };
 ```
 
-Instead of:
+Instead of this:
 
 ```typescript
 const { determineModuleTypes } = require('webpack-node-module-types/sync');
@@ -296,6 +310,9 @@ module.exports = {
   ]
 };
 ```
+
+This is especially useful when using the `monorepo` option, which passes custom
+configuration to `determineModuleTypes(...)` that shouldn't be overwritten.
 
 ## Motivation
 
