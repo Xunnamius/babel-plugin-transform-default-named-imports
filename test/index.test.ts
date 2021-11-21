@@ -23,6 +23,7 @@ const babelOptions = {
   ]
 };
 
+// eslint-disable-next-line jest/require-hook
 pluginTester({
   pluginName: 'transform-default-named-imports',
   plugin,
