@@ -6,9 +6,9 @@ import * as util from '@babel/types';
 
 export type Options = {
   opts: {
-    test?: string[];
-    include?: string[];
-    exclude?: string[];
+    test?: (string | RegExp)[];
+    include?: (string | RegExp)[];
+    exclude?: (string | RegExp)[];
     transformBuiltins?: boolean;
     silent?: boolean;
     verbose?: boolean;
