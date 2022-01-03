@@ -1,6 +1,6 @@
 {
   "name": "babel-plugin-transform-default-named-imports",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Allow importing of named exports from default-exporting (CJS/JSON) modules",
   "keywords": [
     "babel",
