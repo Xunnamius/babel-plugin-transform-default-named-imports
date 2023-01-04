@@ -1,5 +1,5 @@
-[![Black Lives Matter!](https://api.ergodark.com/badges/blm 'Join the movement!')](https://secure.actblue.com/donate/ms_blm_homepage_2019)
-[![Maintenance status](https://img.shields.io/maintenance/active/2022 'Is this package maintained?')](https://www.npmjs.com/package/babel-plugin-transform-default-named-imports)
+[![Black Lives Matter!](https://xunn.at/badge-blm 'Join the movement!')](https://xunn.at/donate-blm)
+[![Maintenance status](https://img.shields.io/maintenance/active/2023 'Is this package maintained?')](https://www.npmjs.com/package/babel-plugin-transform-default-named-imports)
 [![Last commit timestamp](https://img.shields.io/github/last-commit/xunnamius/babel-plugin-transform-default-named-imports 'When was the last commit to the official repo?')](https://www.npmjs.com/package/babel-plugin-transform-default-named-imports)
 [![Open issues](https://img.shields.io/github/issues/xunnamius/babel-plugin-transform-default-named-imports 'Number of known issues with this package')](https://www.npmjs.com/package/babel-plugin-transform-default-named-imports)
 [![Pull requests](https://img.shields.io/github/issues-pr/xunnamius/babel-plugin-transform-default-named-imports 'Number of open pull requests')](https://www.npmjs.com/package/babel-plugin-transform-default-named-imports)
