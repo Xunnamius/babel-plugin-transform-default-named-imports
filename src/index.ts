@@ -1,8 +1,8 @@
-import { PluginObj, PluginPass } from '@babel/core';
-import { builtinModules } from 'module';
+import { builtinModules } from 'node:module';
 import { determineModuleTypes } from 'webpack-node-module-types/sync';
-
 import * as util from '@babel/types';
+
+import type { PluginObj, PluginPass } from '@babel/core';
 
 export type Options = {
   opts: {
@@ -42,7 +42,8 @@ const stringToRegex = (str: string | RegExp, openEnded: boolean) => {
         str.startsWith('/') && str.endsWith('/')
           ? str.slice(1, -1)
           : // ? https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions#Escaping
-            `^${str.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&')}${
+            // eslint-disable-next-line unicorn/better-regex
+            `^${str.replaceAll(/[.*+\-?^${}()|[\]\\]/g, '\\$&')}${
               openEnded ? '([/?#].+)?' : ''
             }$`,
         'i'
@@ -58,7 +59,7 @@ const getDefaultInclusionTests = (monorepo: boolean | string) => {
     : [
         ...determineModuleTypes({
           rootMode: typeof monorepo == 'string' ? monorepo : monorepo ? 'upward' : 'local'
-        }).cjs.map(strToOpenEndedRegex),
+        }).cjs.map((id) => strToOpenEndedRegex(id)),
         /^(\.(\.)?\/)+(.+)\.json$/
       ]);
 };
@@ -66,7 +67,7 @@ const getDefaultInclusionTests = (monorepo: boolean | string) => {
 const getBuiltinInclusionTests = () => {
   return (cache.builtins = cache.builtins.length
     ? cache.builtins
-    : builtinModules.map(strToOpenEndedRegex));
+    : builtinModules.map((id) => strToOpenEndedRegex(id)));
 };
 
 const isCjs = (src: string, state: State) => {
@@ -153,6 +154,7 @@ export default function (): PluginObj<State> {
 
         if (!specifiers.named.length) return;
 
+        // eslint-disable-next-line unicorn/no-keyword-prefix
         const newDefaultSpecifier = util.identifier(
           specifiers.explicitDefault ||
             specifiers.implicitDefault ||
