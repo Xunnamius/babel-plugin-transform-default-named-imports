@@ -1,0 +1,9 @@
+{
+  "pluginOptions": {
+    "test": [
+      "/^apollo/",
+      "/server$/",
+      "my$soft-w4re"
+    ]
+  }
+}

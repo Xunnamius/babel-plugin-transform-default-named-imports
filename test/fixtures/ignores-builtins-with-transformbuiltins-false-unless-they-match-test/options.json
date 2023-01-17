@@ -1,0 +1,8 @@
+{
+  "pluginOptions": {
+    "transformBuiltins": false,
+    "test": [
+      "url"
+    ]
+  }
+}
