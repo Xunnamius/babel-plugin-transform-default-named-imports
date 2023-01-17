@@ -342,27 +342,31 @@ ESM entry point **`my-package.mjs`** for a
 [dual CJS2/ESM](https://nodejs.org/api/packages.html#packages_dual_commonjs_es_module_packages)
 package:
 
-```TypeScript
+```typescript
 /* my-package.ts */
 
 // ▼ #1: an "illegal" named bare CJS import
-import { ApolloServer, gql } from 'apollo-server'
+import { ApolloServer, gql } from 'apollo-server';
 // ▼ #2: a legal named deep ESM import
-import { Button } from 'ui-library/es'
+import { Button } from 'ui-library/es';
 // ▼ #3: an "illegal" named built-in import
-import { parse as parseUrl } from 'url'
+import { parse as parseUrl } from 'url';
 // ▼ #4: a legal default bare CJS import and a legal namespace bare CJS import
-import lib, * as libNamespace from 'cjs-component-library'
+import lib, * as libNamespace from 'cjs-component-library';
 // ▼ #5: a legal default bare CJS import and an "illegal" named bare CJS import
-import lib2, { item1, item2 } from 'cjs2-component2-library2'
+import lib2, { item1, item2 } from 'cjs2-component2-library2';
 // ▼ #6: a legal default bare CJS import
-import lib3 from 'cjs3-component3-library3'
+import lib3 from 'cjs3-component3-library3';
 // ▼ #7: a legal namespace bare CJS import
-import * as lib4 from 'cjs4-component4-library4'
+import * as lib4 from 'cjs4-component4-library4';
 // ▼ #8: a legal named relative ESM import using .mjs (.ts is not allowed here!)
-import { util } from '../lib/module-utils.mjs'
+import { util } from '../lib/module-utils.mjs';
 // ▼ #9: an "illegal" named deep CJS import
-import { default as util2, util as smUtil, cliUtil } from 'some-package/dist/utils.js'
+import {
+  default as util2,
+  util as smUtil,
+  cliUtil
+} from 'some-package/dist/utils.js';
 
 // ...
 ```
