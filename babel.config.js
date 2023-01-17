@@ -6,11 +6,7 @@ const NODE_OLDEST_LTS = '10.13.0';
 
 module.exports = {
   parserOpts: { strictMode: true },
-  plugins: [
-    '@babel/plugin-proposal-export-default-from',
-    '@babel/plugin-proposal-function-bind',
-    '@babel/plugin-transform-typescript'
-  ],
+  plugins: ['@babel/plugin-proposal-export-default-from'],
   env: {
     // * Used by Jest and `npm test`
     test: {
