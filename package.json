@@ -49,8 +49,6 @@
     "clean": "rm -rf dist npm.pipe coverage external-scripts/bin",
     "fixup": "npm run check-types && npm run test && npx npm-force-resolutions && npx Xunnamius/sort-package-json && npm audit",
     "list-tasks": "npm run",
-    "prepublishOnly": "npm run build",
-    "postpublish": "npm run clean",
     "repl": "command -v rlwrap >/dev/null && rlwrap npx -p @babel/core -p @babel/node babel-node",
     "test": "BABEL_ENV=test jest --coverage"
   },
