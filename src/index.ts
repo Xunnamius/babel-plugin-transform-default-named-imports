@@ -58,7 +58,8 @@ const getDefaultInclusionTests = (monorepo: boolean | string) => {
     ? cache.cjsNodeModules
     : [
         ...determineModuleTypes({
-          rootMode: typeof monorepo == 'string' ? monorepo : monorepo ? 'upward' : 'local'
+          rootMode:
+            typeof monorepo === 'string' ? monorepo : monorepo ? 'upward' : 'local'
         }).cjs.map((id) => strToOpenEndedRegex(id)),
         /^(\.(\.)?\/)+(.+)\.json$/
       ]);
@@ -138,7 +139,7 @@ export default function (): PluginObj<State> {
               ? node.imported.value
               : node.imported.name;
 
-            if (name == 'default') specifiers.implicitDefault = node.local.name;
+            if (name === 'default') specifiers.implicitDefault = node.local.name;
 
             if (name != 'default' || specifiers.explicitDefault) {
               specifiers.named.push({

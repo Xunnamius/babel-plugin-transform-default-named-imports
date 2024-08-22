@@ -10,7 +10,7 @@ module.exports = {
   env: {
     // * Used by Jest and `npm test`
     test: {
-      sourceMaps: 'both',
+      sourceMaps: 'inline',
       presets: [
         ['@babel/preset-env', { targets: { node: true } }],
         ['@babel/preset-typescript', { allowDeclareFields: true }]

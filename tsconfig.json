@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "esnext",
-    "module": "esnext",
+    "target": "ESNext",
+    "module": "NodeNext",
     "allowJs": true,
     "checkJs": true,
     // ? Only for Next.js
@@ -12,11 +12,11 @@
     "alwaysStrict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "moduleResolution": "node",
+    "moduleResolution": "NodeNext",
     "baseUrl": ".",
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": ["dom", "dom.iterable", "ESNext"],
     "skipLibCheck": true,
     "noEmit": true,
     "esModuleInterop": true,
